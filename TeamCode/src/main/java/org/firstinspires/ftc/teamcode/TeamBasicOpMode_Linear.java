@@ -55,6 +55,7 @@ import com.qualcomm.robotcore.util.Range;
 //@Disabled
 public class TeamBasicOpMode_Linear extends LinearOpMode {
 
+
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftfr = null;
@@ -62,6 +63,10 @@ public class TeamBasicOpMode_Linear extends LinearOpMode {
     private DcMotor rightfr = null;
     private DcMotor rightback = null;
 
+    double leftfrPower;
+    double leftbackPower;
+    double rightfrPower;
+    double rightbackPower;
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -70,10 +75,10 @@ public class TeamBasicOpMode_Linear extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftfr  = hardwareMap.get(DcMotor.class, "left_front");
-        leftback  = hardwareMap.get(DcMotor.class, "left_back");
-        rightfr = hardwareMap.get(DcMotor.class, "right_front");
-        rightback  = hardwareMap.get(DcMotor.class, "right_back");
+        leftfr  = hardwareMap.get(DcMotor.class, "leftf");
+        leftback  = hardwareMap.get(DcMotor.class, "leftb");
+        rightfr = hardwareMap.get(DcMotor.class, "rightf");
+        rightback  = hardwareMap.get(DcMotor.class, "rightb");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -86,28 +91,64 @@ public class TeamBasicOpMode_Linear extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double leftfrPower;
-            double leftbackPower;
-            double rightfrPower;
-            double rightbackPower;
 
 
-            //new code that controls left wheels with left stick and right wheels with right stick
-            double rightdrive = gamepad1.right_stick_y;
-            double leftdrive = gamepad1.left_stick_y;
-            leftfrPower = Range.clip(leftdrive, -1.0, 1.0) ;
-            leftbackPower = Range.clip(leftdrive, -1.0, 1.0) ;
-            rightfrPower = Range.clip(rightdrive, -1.0, 1.0) ;
-            rightbackPower = Range.clip(rightdrive, -1.0, 1.0) ;
+            double straifPower = gamepad1.right_stick_x;
+            double tankPower = gamepad1.right_stick_y;
+            double turnPower = gamepad1.left_stick_x;
 
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
+            if (turnPower < -0.1){
+                leftfrPower = Range.clip(-turnPower, -1.0, 1.0) ;
+                leftbackPower = Range.clip(-turnPower, -1.0, 1.0) ;
+                rightfrPower = Range.clip(turnPower, -1.0, 1.0) ;
+                rightbackPower = Range.clip(turnPower, -1.0, 1.0) ;
+            }
+            else if (turnPower > 0.1){
+                leftfrPower = Range.clip(-turnPower, -1.0, 1.0) ;
+                leftbackPower = Range.clip(-turnPower, -1.0, 1.0) ;
+                rightfrPower = Range.clip(turnPower, -1.0, 1.0) ;
+                rightbackPower = Range.clip(turnPower, -1.0, 1.0) ;
+            }
+            else if (straifPower < -0.1){
+                leftfrPower = Range.clip(-straifPower, -1.0, 1.0) ;
+                leftbackPower = Range.clip(straifPower, -1.0, 1.0) ;
+                rightfrPower = Range.clip(straifPower, -1.0, 1.0) ;
+                rightbackPower = Range.clip(-straifPower, -1.0, 1.0) ;
+            }
+            else if (straifPower > 0.1){
+                leftfrPower = Range.clip(-straifPower, -1.0, 1.0) ;
+                leftbackPower = Range.clip(straifPower, -1.0, 1.0) ;
+                rightfrPower = Range.clip(straifPower, -1.0, 1.0) ;
+                rightbackPower = Range.clip(-straifPower, -1.0, 1.0) ;
+            }
+            else if (tankPower < -0.1){
+                leftbackPower = Range.clip(tankPower, -1.0, 1.0) ;
+                rightbackPower = Range.clip(tankPower, -1.0, 1.0) ;
+                leftfrPower = Range.clip(tankPower, -1.0, 1.0) ;
+                rightfrPower = Range.clip(tankPower, -1.0, 1.0) ;
+            }
+            else if (tankPower > 0.1){
+                leftfrPower = Range.clip(tankPower, -1.0, 1.0) ;
+                rightfrPower = Range.clip(tankPower, -1.0, 1.0) ;
+                leftbackPower = Range.clip(tankPower, -1.0, 1.0) ;
+                rightbackPower = Range.clip(tankPower, -1.0, 1.0) ;
+            }
+            else {
+                tankPower = 0.0;
+                turnPower = 0.0;
+                leftfrPower = Range.clip(tankPower, -1.0, 1.0) ;
+                rightfrPower = Range.clip(tankPower, -1.0, 1.0) ;
+                leftbackPower = Range.clip(tankPower, -1.0, 1.0) ;
+                rightbackPower = Range.clip(tankPower, -1.0, 1.0) ;
+            }
+
+
+
 
             // Send calculated power to wheels
             leftfr.setPower(leftfrPower);
