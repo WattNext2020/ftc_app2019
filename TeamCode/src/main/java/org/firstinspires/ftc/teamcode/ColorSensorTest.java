@@ -30,9 +30,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -48,22 +48,22 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="StraifOpMode", group="Opmode")
-public class StraifOpMode extends OpMode
+@TeleOp(name="ColorSensorTest", group="Opmode")
+public class ColorSensorTest extends OpMode
 {
     // Declare OpMode members.
     DcMotor rightfDrive, rightbDrive, leftfDrive, leftbDrive;
-
+    ColorSensor color_sensor1;
     @Override
     public void init() {
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        rightfDrive = hardwareMap.get(DcMotor.class, "rightf");
-        rightbDrive = hardwareMap.get(DcMotor.class, "rightb");
-        leftfDrive  = hardwareMap.get(DcMotor.class, "leftf");
-        leftbDrive = hardwareMap.get(DcMotor.class, "leftb");
+        rightfDrive = hardwareMap.get(DcMotor.class, "rightF");
+        rightbDrive = hardwareMap.get(DcMotor.class, "rightB");
+        leftfDrive  = hardwareMap.get(DcMotor.class, "leftF");
+        leftbDrive = hardwareMap.get(DcMotor.class, "leftB");
 
 
         leftfDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -73,6 +73,7 @@ public class StraifOpMode extends OpMode
 
         // Tell the driver that initialization is complete.
 
+        color_sensor1 = hardwareMap.colorSensor.get("color");
     }
 
     /*
@@ -80,6 +81,21 @@ public class StraifOpMode extends OpMode
      */
     @Override
     public void init_loop() {
+        if (color_sensor1.red() > 150)
+        {
+            if (color_sensor1.green() > 150)
+            {
+                color_sensor1.enableLed(true);
+            }
+            else
+            {
+                color_sensor1.enableLed(false);
+            }
+        }
+        else
+        {
+            color_sensor1.enableLed(false);
+        }
     }
 
     /*
@@ -94,10 +110,6 @@ public class StraifOpMode extends OpMode
 
 
 
-        rightbDrive.setPower(0.50);
-        rightfDrive.setPower(-0.50);
-        leftfDrive.setPower(-0.50);
-        leftbDrive.setPower(0.50);
 
 
 

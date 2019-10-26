@@ -29,8 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -48,12 +46,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="StraifOpMode", group="Opmode")
-public class StraifOpMode extends OpMode
+@TeleOp(name="NewTestOpMode", group="Opmode")
+public class NewTestOpMode extends OpMode
 {
     // Declare OpMode members.
     DcMotor rightfDrive, rightbDrive, leftfDrive, leftbDrive;
 
+    double motorPower, straifPower, turnPower;
     @Override
     public void init() {
 
@@ -68,8 +67,8 @@ public class StraifOpMode extends OpMode
 
         leftfDrive.setDirection(DcMotor.Direction.FORWARD);
         leftbDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightfDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightbDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightfDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightbDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Tell the driver that initialization is complete.
 
@@ -88,16 +87,67 @@ public class StraifOpMode extends OpMode
     @Override
     public void loop() {
         // Setup a variable for each drive wheel to save power level for telemetry
+//Following for forward/backward
+motorPower = gamepad1.right_stick_y;
+straifPower = gamepad1.right_stick_x;
+turnPower = gamepad1.left_stick_y;
+        if (motorPower<0)
+            {
+                rightbDrive.setPower(motorPower);
+                rightfDrive.setPower(motorPower);
+                leftfDrive.setPower(-motorPower);
+                leftbDrive.setPower(-motorPower);
+            }
+        else if (motorPower>0)
+        {
+            rightbDrive.setPower(-motorPower);
+            rightfDrive.setPower(-motorPower);
+            leftfDrive.setPower(motorPower);
+            leftbDrive.setPower(motorPower);
+
+        }
+        //Following for straif code
+        if (straifPower>0)
+        {
+            rightfDrive.setPower(straifPower);
+            leftbDrive.setPower(straifPower);
+            leftfDrive.setPower(-straifPower);
+            rightbDrive.setPower(-straifPower);
+
+        }
+        else if(straifPower<0)
+        {
+
+            rightfDrive.setPower(-straifPower);
+            leftbDrive.setPower(-straifPower);
+            leftfDrive.setPower(straifPower);
+            rightbDrive.setPower(straifPower);
+        }
+        if (turnPower>0)
+        {
+            rightfDrive.setPower(turnPower);
+            rightbDrive.setPower(turnPower);
+            leftbDrive.setPower(turnPower);
+            leftfDrive.setPower(turnPower);
+        }
+        else if (turnPower<0)
+        {
+            rightfDrive.setPower(turnPower);
+            rightbDrive.setPower(turnPower);
+            leftbDrive.setPower(turnPower);
+            leftfDrive.setPower(turnPower);
+        }
 
 
 
 
 
 
-        rightbDrive.setPower(0.50);
-        rightfDrive.setPower(-0.50);
-        leftfDrive.setPower(-0.50);
-        leftbDrive.setPower(0.50);
+
+
+
+
+
 
 
 
@@ -105,9 +155,4 @@ public class StraifOpMode extends OpMode
 
 
     }
-
-    @Override
-    public void stop() {
-    }
-
 }
