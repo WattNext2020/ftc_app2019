@@ -162,6 +162,7 @@ public class TeamBasicOpMode_Linear extends LinearOpMode {
                 rightbackPower = Range.clip(tankPower, -1.0, 1.0) ;
             }
 
+            //pickup mechanism
             double gather = gamepad2.right_stick_y;
 
             if ( gather>0.0 ) {
