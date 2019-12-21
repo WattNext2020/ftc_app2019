@@ -29,11 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -48,12 +47,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="StraifOpMode", group="Opmode")
-public class StraifOpMode extends OpMode
+@TeleOp(name="StrafingTest", group="Opmode")
+public class StrafingTest extends OpMode
 {
     // Declare OpMode members.
-    DcMotor rightfDrive, rightbDrive, leftfDrive, leftbDrive;
+   DcMotor rightfDrive, rightbDrive, leftfDrive, leftbDrive;
 
+   double motorPowerRight, motorPowerLeft;
     @Override
     public void init() {
 
@@ -68,10 +68,11 @@ public class StraifOpMode extends OpMode
 
         leftfDrive.setDirection(DcMotor.Direction.FORWARD);
         leftbDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightfDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightbDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightfDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightbDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Tell the driver that initialization is complete.
+        telemetry.addData("Value:", "Right: ",motorPowerRight, "  Left: ", motorPowerLeft );
 
     }
 
@@ -90,24 +91,12 @@ public class StraifOpMode extends OpMode
         // Setup a variable for each drive wheel to save power level for telemetry
 
 
+       rightbDrive.setPower(gamepad1.left_stick_x);
+       leftfDrive.setPower(gamepad1.left_stick_x);
 
-
-
-
-        rightbDrive.setPower(0.50);
-        rightfDrive.setPower(-0.50);
-        leftfDrive.setPower(-0.50);
-        leftbDrive.setPower(0.50);
-
-
-
-
+       rightfDrive.setPower(gamepad1.right_stick_x);
+       leftbDrive.setPower(gamepad1.right_stick_x);
 
 
     }
-
-    @Override
-    public void stop() {
-    }
-
 }

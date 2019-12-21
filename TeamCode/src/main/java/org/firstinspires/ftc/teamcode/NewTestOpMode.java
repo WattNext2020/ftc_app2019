@@ -29,12 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -50,41 +47,32 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Iterative OpMode", group="Iterative Opmode")
-@Disabled
-public class BasicOpMode_Iterative extends OpMode
+@TeleOp(name="NewTestOpMode", group="Opmode")
+public class NewTestOpMode extends OpMode
 {
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftfr = null;
-    private DcMotor leftback = null;
-    private DcMotor rightfr = null;
-    private DcMotor rightback = null;
+    DcMotor rightfDrive, rightbDrive, leftfDrive, leftbDrive;
 
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+    double motorPower, straifPower, turnPower;
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftfr  = hardwareMap.get(DcMotor.class, "left_front");
-        leftback  = hardwareMap.get(DcMotor.class, "left_back");
-        rightfr = hardwareMap.get(DcMotor.class, "right_front");
-        rightback  = hardwareMap.get(DcMotor.class, "right_back");
+        rightfDrive = hardwareMap.get(DcMotor.class, "rightf");
+        rightbDrive = hardwareMap.get(DcMotor.class, "rightb");
+        leftfDrive  = hardwareMap.get(DcMotor.class, "leftf");
+        leftbDrive = hardwareMap.get(DcMotor.class, "leftb");
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        leftfr.setDirection(DcMotor.Direction.FORWARD);
-        leftback.setDirection(DcMotor.Direction.FORWARD);
-        rightfr.setDirection(DcMotor.Direction.REVERSE);
-        rightback.setDirection(DcMotor.Direction.REVERSE);
+
+        leftfDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftbDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightfDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightbDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+
     }
 
     /*
@@ -98,54 +86,74 @@ public class BasicOpMode_Iterative extends OpMode
      * Code to run ONCE when the driver hits PLAY
      */
     @Override
-    public void start() {
-        runtime.reset();
-    }
-
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
-    @Override
     public void loop() {
         // Setup a variable for each drive wheel to save power level for telemetry
-        double leftfrPower;
-        double leftbackPower;
-        double rightfrPower;
-        double rightbackPower;
+//Following for forward/backward
+motorPower = gamepad1.right_stick_y;
+straifPower = gamepad1.right_stick_x;
+turnPower = gamepad1.left_stick_y;
+        if (motorPower<0)
+            {
+                rightbDrive.setPower(motorPower);
+                rightfDrive.setPower(motorPower);
+                leftfDrive.setPower(-motorPower);
+                leftbDrive.setPower(-motorPower);
+            }
+        else if (motorPower>0)
+        {
+            rightbDrive.setPower(-motorPower);
+            rightfDrive.setPower(-motorPower);
+            leftfDrive.setPower(motorPower);
+            leftbDrive.setPower(motorPower);
+
+        }
+        //Following for straif code
+        if (straifPower>0)
+        {
+            rightfDrive.setPower(straifPower);
+            leftbDrive.setPower(straifPower);
+            leftfDrive.setPower(-straifPower);
+            rightbDrive.setPower(-straifPower);
+
+        }
+        else if(straifPower<0)
+        {
+
+            rightfDrive.setPower(-straifPower);
+            leftbDrive.setPower(-straifPower);
+            leftfDrive.setPower(straifPower);
+            rightbDrive.setPower(straifPower);
+        }
+        if (turnPower>0)
+        {
+            rightfDrive.setPower(turnPower);
+            rightbDrive.setPower(turnPower);
+            leftbDrive.setPower(turnPower);
+            leftfDrive.setPower(turnPower);
+        }
+        else if (turnPower<0)
+        {
+            rightfDrive.setPower(turnPower);
+            rightbDrive.setPower(turnPower);
+            leftbDrive.setPower(turnPower);
+            leftfDrive.setPower(turnPower);
+        }
 
 
-        double Rightsidedrivef = gamepad1.right_stick_y;
-        double Rightsidedriveb = -gamepad1.left_stick_y;
-        leftfrPower = Range.clip(Rightsidedriveb, -1.0, 1.0) ;
-        leftbackPower = Range.clip(Rightsidedrivef, -1.0, 1.0) ;
-        rightfrPower = Range.clip(Rightsidedrivef, -1.0, 1.0) ;
-        rightbackPower = Range.clip(Rightsidedriveb, -1.0, 1.0) ;
-
-        double Leftsidedrivef = gamepad1.right_stick_x;
-        double Leftsidedriveb = -gamepad1.left_stick_x;
-        leftfrPower = Range.clip(Leftsidedrivef, -1.0, 1.0) ;
-        leftbackPower = Range.clip(Leftsidedriveb, -1.0, 1.0) ;
-        rightfrPower = Range.clip(Leftsidedriveb, -1.0, 1.0) ;
-        rightbackPower = Range.clip(Leftsidedrivef, -1.0, 1.0) ;
 
 
-        // Send calculated power to wheels
-        leftfr.setPower(leftfrPower);
-        leftback.setPower(leftbackPower);
-        rightfr.setPower(rightfrPower);
-        rightback.setPower(rightbackPower);
 
-        // Show the elapsed game time and wheel power.
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftfrPower,leftbackPower, rightfrPower,rightbackPower);
-        telemetry.update();
+
+
+
+
+
+
+
+
+
+
+
+
     }
-
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
-    }
-
 }
