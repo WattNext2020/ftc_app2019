@@ -32,7 +32,7 @@
         DcMotor rightfDrive, rightbDrive, leftfDrive, leftbDrive;
         Servo leftHook, rightHook;
         int MOTOR_TICKS = 1680;
-        int TURN_TICKS = 820;
+        int TURN_TICKS = 420;
 
 
         @Override
@@ -52,7 +52,6 @@
             rightfDrive.setDirection(DcMotor.Direction.FORWARD);
             rightbDrive.setDirection(DcMotor.Direction.FORWARD);
 
-            rightbDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightbDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             rightHook.setDirection(Servo.Direction.REVERSE);
@@ -91,7 +90,7 @@
     */
 
 
-                rightbDrive.setTargetPosition(MOTOR_TICKS);
+      /*          rightbDrive.setTargetPosition(MOTOR_TICKS);
                 rightbDrive.setPower(0.5);
                 rightbDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 rightfDrive.setPower(0.5);
@@ -110,14 +109,27 @@
                     leftfDrive.setPower(0);
                     leftbDrive.setPower(0);
                     sleep(1000);
-                    rightbDrive.setTargetPosition(TURN_TICKS);
-                    rightbDrive.setPower(-0.5);
+
+       */
+
+                telemetry.addData("Right Motor Current: ", rightbDrive.getCurrentPosition());
+                telemetry.addData("Right Motor Target: ", rightbDrive.getTargetPosition());
+                telemetry.addData("Right Motor Ticks To Add: ", TURN_TICKS);
+                telemetry.update();
+                rightbDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                sleep(2000);
+                rightbDrive.setTargetPosition(-TURN_TICKS);
+                rightbDrive.setPower(-0.5);
                     rightbDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     rightfDrive.setPower(-0.5);
                     leftfDrive.setPower(0.5);
                     leftbDrive.setPower(0.5);
-                    if (rightbDrive.getCurrentPosition()>=(TURN_TICKS-20))
+
+                    if (rightbDrive.getCurrentPosition()<=(-TURN_TICKS+20))
                     {
+                        telemetry.addData("Setting to","0");
+                        telemetry.update();
                         rightbDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         rightbDrive.setPower(0);
                         rightfDrive.setPower(0);
@@ -162,7 +174,6 @@
             }
 
 
-        }
 
 
 
