@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@Autonomous(name= "Blue_Block_Pickup", group= "Linear Opmode")
+@Autonomous(name= "Blue Block Pickup", group= "Linear Opmode")
 
 public class Blue_Block_Pickup extends LinearOpMode {
     // Declare OpMode members.

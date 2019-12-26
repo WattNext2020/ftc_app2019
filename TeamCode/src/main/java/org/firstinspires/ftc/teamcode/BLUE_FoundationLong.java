@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name= "BLUE Foundation Long", group= "Linear Opmode")
+@Autonomous(name= "BLUE Foundation LONG", group= "Linear Opmode")
 
 public class BLUE_FoundationLong extends LinearOpMode {
     // Declare OpMode members.
