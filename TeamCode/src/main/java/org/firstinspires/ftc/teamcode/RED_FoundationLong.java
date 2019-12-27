@@ -81,8 +81,7 @@ public class RED_FoundationLong extends LinearOpMode {
         rightfr = hardwareMap.get(DcMotor.class, "rightf");
         rightback = hardwareMap.get(DcMotor.class, "rightb");
 
-        leftWheels = hardwareMap.get(CRServo.class, "lw");
-        rightWheels = hardwareMap.get(CRServo.class, "rw");
+
         //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
         //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
 

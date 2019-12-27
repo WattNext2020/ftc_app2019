@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 
-@TeleOp(name= "TeleOp", group= "Linear Opmode")
+@TeleOp(name= "TeleOpT", group= "Linear Opmode")
 
 public class TeleOpMode extends LinearOpMode {
 //@Disabled
@@ -33,7 +33,6 @@ public class TeleOpMode extends LinearOpMode {
 
     private CRServo leftWheels = null;
     private CRServo rightWheels = null;
-    private CRServo rackPinionUD = null;
     private CRServo rackPinionLR = null;
 
     private DistanceSensor sensorRange;
@@ -45,11 +44,10 @@ public class TeleOpMode extends LinearOpMode {
 
     double leftPower;
     double rightPower;
-    double rackPowerUD;
     double rackPowerLR;
 
 
-    double cap;
+    boolean cap;
 
 
     double lastSlow = 0;
@@ -62,6 +60,8 @@ public class TeleOpMode extends LinearOpMode {
 
     boolean first = true;
 
+
+    CRServo capStone;
 
     boolean rhook;
     boolean lhook;
@@ -89,7 +89,7 @@ public class TeleOpMode extends LinearOpMode {
 
         leftWheels = hardwareMap.get(CRServo.class, "lw");   //leftwheels
         rightWheels = hardwareMap.get(CRServo.class, "rw");  //rightwheels
-        rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");  // Rack and Pinion Vertical
+        capStone = hardwareMap.get (CRServo.class, "Cap");  // Rack and Pinion Vertical
         rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");   //Rack and Pinion Horizontal
         rightHook = hardwareMap.get(Servo.class,"rightHook");
         leftHook = hardwareMap.get(Servo.class,"leftHook");
@@ -109,7 +109,6 @@ public class TeleOpMode extends LinearOpMode {
 
         leftWheels.setDirection(CRServo.Direction.REVERSE);
         rightWheels.setDirection(CRServo.Direction.FORWARD);
-        rackPinionUD.setDirection(CRServo.Direction.FORWARD);
         rackPinionLR.setDirection(CRServo.Direction.FORWARD);
 
 
@@ -147,6 +146,8 @@ public class TeleOpMode extends LinearOpMode {
                 leftHook.setPosition(0);
                 slowMode = false;
             }
+
+
 
             first = false;
 
@@ -204,8 +205,6 @@ public class TeleOpMode extends LinearOpMode {
 
 
 
-
-
             //Slowmode Code
 
             if (gamepad1.a == true) {
@@ -229,17 +228,17 @@ public class TeleOpMode extends LinearOpMode {
 
 
             }
-            if(gamepad2.x == true)
+           if(gamepad2.x == true)
             {
                 if ((runtime.seconds()-lastTank) > .5)
                 {
                     if(Tank == false)
                     {
-                        Tank = true;
+                        cap = true;
                     }
                     else
                     {
-                        Tank = false;
+                        cap = false;
                     }
                 }
             }
@@ -279,6 +278,12 @@ public class TeleOpMode extends LinearOpMode {
             {
                 rightHook.setPosition(0);
             }
+
+            if (gamepad2.x == true)
+            {
+                capStone.setPower(1);
+            }
+
 
 
 
@@ -338,16 +343,16 @@ public class TeleOpMode extends LinearOpMode {
             leftPower = Range.clip(gather, -1.0, 1.0);
             rightPower = Range.clip(gather, -1.0, 1.0);
 
-            cap = 0;
+            capStone.setPower(0);
             if(gamepad2.a == true)
             {
-                cap = -1;
+                capStone.setPower(1);
             }
 
 
             if(gamepad2.b == true)
             {
-                cap = 1;
+                capStone.setPower(-1);
             }
 
             if(Tank == true)
@@ -377,18 +382,7 @@ public class TeleOpMode extends LinearOpMode {
 
 
 
-            double upDown = cap*-.3;
 
-            if (upDown > 0.0){
-                rackPowerUD = Range.clip(upDown, -1.0, 1.0);
-            }
-            else if (upDown < 0.0) {
-                rackPowerUD = Range.clip(upDown, -1.0, 1.0);
-            }
-            else {
-                upDown = 0.0;
-                rackPowerUD = 0.0;
-            }
 
             double side = gamepad2.left_stick_x;
 
@@ -415,7 +409,6 @@ public class TeleOpMode extends LinearOpMode {
 
             //arm movement power
             rackPinionLR.setPower(rackPowerLR);
-            rackPinionUD.setPower(rackPowerUD);
 
 
 

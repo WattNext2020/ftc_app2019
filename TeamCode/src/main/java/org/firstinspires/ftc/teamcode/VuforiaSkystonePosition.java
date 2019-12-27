@@ -30,19 +30,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -89,8 +84,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@Autonomous(name="SKYSTONE Vuforia Nav", group ="Concept")
-public class VuforiaSkyStone extends LinearOpMode {
+@Autonomous(name="SKYSTONE Vuforia Position Update", group ="Concept")
+public class VuforiaSkystonePosition extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -99,7 +94,7 @@ public class VuforiaSkyStone extends LinearOpMode {
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final boolean PHONE_IS_PORTRAIT = false;
 
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftfr = null;
@@ -125,8 +120,12 @@ public class VuforiaSkyStone extends LinearOpMode {
     double rightPower;
     double rackPowerUD;
     double rackPowerLR;
-    double counter = 0;
+    int location = 0;
+    int MOTOR_TICKS = 675;
+    int STRAFE_TICKS=120;
 
+
+    /*
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
@@ -139,13 +138,13 @@ public class VuforiaSkyStone extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY ="Aclq12D/////AAABmReYPG5/qkp0qP3/6pGHt+xWyWL7hC7mxarpON4/Pamia/rCbIo+26hHFXQr6LDW6BwmopcEA3sowSlSOsPd9AxduJY6MjZfIILe2rAXliUHeFspqohAwhRRxkBILOPsy/kJEw/u1/zrh+VTxOFfOEVGFjEwiMhQ41C/AEVPX3N0dxhT5IgmOL69Vol3zok/idBYDJsX9XyY3cdXnNNegSjRb9XL28T1U27grr96I1Gm5gcOEk0FZuEkMPFb8c4txRADsYIBxkSXrQ2OmjgCj1/aQMbi+jUlIYbqpaZKOciBzd5zV0LiDeh/QFi1Xdq4x2pZ9COnGZqrC8JmbBAjmDfiA70H7BZheLOhbAo/K3gU";
-    //    " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+    private static final String VUFORIA_KEY = "Aclq12D/////AAABmReYPG5/qkp0qP3/6pGHt+xWyWL7hC7mxarpON4/Pamia/rCbIo+26hHFXQr6LDW6BwmopcEA3sowSlSOsPd9AxduJY6MjZfIILe2rAXliUHeFspqohAwhRRxkBILOPsy/kJEw/u1/zrh+VTxOFfOEVGFjEwiMhQ41C/AEVPX3N0dxhT5IgmOL69Vol3zok/idBYDJsX9XyY3cdXnNNegSjRb9XL28T1U27grr96I1Gm5gcOEk0FZuEkMPFb8c4txRADsYIBxkSXrQ2OmjgCj1/aQMbi+jUlIYbqpaZKOciBzd5zV0LiDeh/QFi1Xdq4x2pZ9COnGZqrC8JmbBAjmDfiA70H7BZheLOhbAo/K3gU";
+    //   " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
-    private static final float mmPerInch        = 25.4f;
-    private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
+    private static final float mmPerInch = 25.4f;
+    private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
 
     // Constant for Stone Target
     private static final float stoneZ = 2.00f * mmPerInch;
@@ -159,56 +158,19 @@ public class VuforiaSkyStone extends LinearOpMode {
 
     // Constants for perimeter targets
     private static final float halfField = 72 * mmPerInch;
-    private static final float quadField  = 36 * mmPerInch;
+    private static final float quadField = 36 * mmPerInch;
 
     // Class Members
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
     private boolean targetVisible = false;
-    private float phoneXRotate    = 0;
-    private float phoneYRotate    = 0;
-    private float phoneZRotate    = 0;
-
-    @Override public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        leftfr = hardwareMap.get(DcMotor.class, "leftf");
-        leftback = hardwareMap.get(DcMotor.class, "leftb");
-        rightfr = hardwareMap.get(DcMotor.class, "rightf");
-        rightback = hardwareMap.get(DcMotor.class, "rightb");
-
-        leftWheels = hardwareMap.get(CRServo.class, "lw");
-        rightWheels = hardwareMap.get(CRServo.class, "rw");
-        //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
-        //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
-
-        leftHook = hardwareMap.get(Servo.class, "leftHook");
-        rightHook = hardwareMap.get(Servo.class, "rightHook");
+    private float phoneXRotate = 0;
+    private float phoneYRotate = 0;
+    private float phoneZRotate = 0;
 
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        leftfr.setDirection(DcMotor.Direction.FORWARD);
-        leftback.setDirection(DcMotor.Direction.FORWARD);
-        rightfr.setDirection(DcMotor.Direction.REVERSE);
-        rightback.setDirection(DcMotor.Direction.REVERSE);
-
-        leftWheels.setDirection(CRServo.Direction.REVERSE);
-        rightWheels.setDirection(CRServo.Direction.FORWARD);
-        //rackPinionUD.setDirection(CRServo.Direction.FORWARD);
-        //rackPinionLR.setDirection(CRServo.Direction.FORWARD);
-
-        rightHook.setDirection(Servo.Direction.REVERSE);
-        //rightfr.setmode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //leftfr.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        //int MOTORTICKS = 1680;
-
-        leftHook.setPosition(0);
-        rightHook.setPosition(0);
+    @Override
+    public void runOpMode() {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -364,7 +326,7 @@ public class VuforiaSkyStone extends LinearOpMode {
         // Next, translate the camera lens to where it is on the robot.
         // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
         final float CAMERA_FORWARD_DISPLACEMENT = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
-        final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
+        final float CAMERA_VERTICAL_DISPLACEMENT = .0f * mmPerInch;   // eg: Camera is 8 Inches above ground
         final float CAMERA_LEFT_DISPLACEMENT = 0;     // eg: Camera is ON the robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
@@ -375,6 +337,49 @@ public class VuforiaSkyStone extends LinearOpMode {
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        leftfr = hardwareMap.get(DcMotor.class, "leftf");
+        leftback = hardwareMap.get(DcMotor.class, "leftb");
+        rightfr = hardwareMap.get(DcMotor.class, "rightf");
+        rightback = hardwareMap.get(DcMotor.class, "rightb");
+
+        leftWheels = hardwareMap.get(CRServo.class, "lw");
+        rightWheels = hardwareMap.get(CRServo.class, "rw");
+        //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
+        //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
+
+        leftHook = hardwareMap.get(Servo.class, "leftHook");
+        rightHook = hardwareMap.get(Servo.class, "rightHook");
+
+
+        // Most robots need the motor on one side to be reversed to drive forward
+        // Reverse the motor that runs backwards when connected directly to the battery
+        leftfr.setDirection(DcMotor.Direction.FORWARD);
+        leftback.setDirection(DcMotor.Direction.FORWARD);
+        rightfr.setDirection(DcMotor.Direction.REVERSE);
+        rightback.setDirection(DcMotor.Direction.REVERSE);
+
+        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftWheels.setDirection(CRServo.Direction.REVERSE);
+        rightWheels.setDirection(CRServo.Direction.FORWARD);
+        //rackPinionUD.setDirection(CRServo.Direction.FORWARD);
+        //rackPinionLR.setDirection(CRServo.Direction.FORWARD);
+
+        rightHook.setDirection(Servo.Direction.REVERSE);
+        //rightfr.setmode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //leftfr.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        //int MOTORTICKS = 1680;
+
+        leftHook.setPosition(0);
+        rightHook.setPosition(0);
+
 
         // WARNING:
         // In this sample, we do not wait for PLAY to be pressed.  Target Tracking is started immediately when INIT is pressed.
@@ -382,150 +387,172 @@ public class VuforiaSkyStone extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        // waitForStart();
-
+        waitForStart();
+        runtime.reset();
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        waitForStart();
-        targetsSkyStone.activate();
+
         while (opModeIsActive()) {
-
-            // check all the trackable targets to see which one (if any) is visible.
-            targetVisible = false;
-            // Provide feedback as to where the robot is located (if we know).
-            if (targetVisible) {
-                ObjectDetectionTrue(true);
-                VectorF translation = lastLocation.getTranslation();
-                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f", translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-                telemetry.update();
-                double yCoordinate = translation.get(1)/mmPerInch;
-
-                leftfr.setPower(0);
-                leftback.setPower(0);
-                rightfr.setPower(0);
-                rightback.setPower(0);
-
-                if(yCoordinate>=0.5) {
-                    leftfr.setPower(0.3);
-                    leftback.setPower(-0.3);
-                    rightfr.setPower(-0.3);
-                    rightback.setPower(0.3);
-                    telemetry.addData("Right:","True");
-                    telemetry.update();
+            EncoderMove(rightback, rightfr, leftfr, leftback);
+            targetsSkyStone.activate();
+            for (VuforiaTrackable trackable : allTrackables) {
+                if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                    targetVisible = true;
+                    location = 1;
+                    SkystoneLocation(location); //prints where it is - should be right
+                    //  targetTelemetry(targetVisible); //prints if target is visible
+                    sleep(2000);
+                    stop();
+                    break;
                 }
-                if (yCoordinate<=-0.5) {
-                    leftfr.setPower(-0.3);
-                    leftback.setPower(0.3);
-                    rightfr.setPower(0.3);
-                    rightback.setPower(-0.3);
-                    telemetry.addData("Left:","True");
-                    telemetry.update();
+                else {
+                    sleep(2000);
+                    telemetry.addData("Did not Detect")
+                    stop();
                 }
-                sleep(2000);
-                stop();
-                //        double  xCoordinate = translation.get(0)/mmPerInch;
-            }
-            else {
-                telemetry.addData("Visible Target", "none");
-                ObjectDetectionFalse(false,runtime.seconds());
-            }
+     /*               targetVisible = false;
+                    EncoderStrafe(rightback, rightfr, leftfr, leftback);
+                    if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                        targetVisible = true;
+                        location = 2;
+                        SkystoneLocation(location); // prints where it is - should be middle
+                        //   targetTelemetry(targetVisible);
+                        sleep(2000);
+                        stop();
+                        break;
+                    } else {
+                        targetsSkyStone.deactivate();
+                        location = 3;
+                        SkystoneLocation(location); //prints where it is - should be left
+                        EncoderStrafe(rightback, rightfr, leftfr, leftback);
+                        stop();
 
-            telemetry.update();
-        }
-
-        // Disable Tracking when we are done;
-        targetsSkyStone.deactivate();
-    }
-
-          /*    while(yCoordinate<-1)
-                {
-                    leftfr.setPower(-0.3);
-                    leftback.setPower(0.3);
-                    rightfr.setPower(0.3);
-                    rightback.setPower(-0.3);
-
-                    telemetry.addData("Y Coordinate:",yCoordinate);
-                    translation = lastLocation.getTranslation();
-                    telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f", translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-
-                    yCoordinate = translation.get(1);
-                    telemetry.update();
-                }
-                while(yCoordinate>1)
-                {
-                      leftfr.setPower(0.3);
-                    leftback.setPower(-0.3);
-                    rightfr.setPower(-0.3);
-                    rightback.setPower(0.3);
-
-                    translation = lastLocation.getTranslation();
-                    telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f", translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-                    yCoordinate = translation.get(1);
-                    telemetry.addData("Y Coordinate:",yCoordinate);
-                    telemetry.update();
-                }
-
-                leftfr.setPower(0);
-                leftback.setPower(0);
-                rightfr.setPower(0);
-                rightback.setPower(0);
-                sleep(1000);
+                    }
 
 */
-
-
-                // express position (translation) of robot in inches.
-
-                // express the rotation of the robot in degrees.
-                //   Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                //    telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
-
-
-
-
-    public void ObjectDetectionFalse (boolean targetVisible, double initTime)
-    {
-        if (targetVisible==false)
-        {
-
-                while(((runtime.seconds() -initTime) < 1) &&(counter<=3)) {
-                leftfr.setPower(0.2);
-                leftback.setPower(0.2);
-                rightfr.setPower(0.2);
-                rightback.setPower(0.2);
-                telemetry.addData("Counter value:", counter);
-                telemetry.update();
             }
-            leftfr.setPower(0);
-            leftback.setPower(0);
-            rightfr.setPower(0);
-            rightback.setPower(0);
-            sleep(2000);
+        }
+        // }
+        // }
 
+    }
+
+    public void EncoderMove(DcMotor rightback, DcMotor rightfr,DcMotor leftfr,DcMotor leftback)
+    {
+        rightback.setTargetPosition(rightback.getCurrentPosition() + MOTOR_TICKS);
+        rightback.setPower(0.3);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setPower(0.3);
+        leftfr.setPower(0.3);
+        leftback.setPower(0.3);
+
+        while (rightback.isBusy()) {
+            telemetry.addData("Right Motor Current: ", rightback.getCurrentPosition());
+            telemetry.addData("Right Motor Target: ", rightback.getTargetPosition());
+            telemetry.addData("Right Motor Ticks To Add: ", MOTOR_TICKS);
+            telemetry.update();
+            if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 5)) {
+                rightback.setPower(0);
+                rightfr.setPower(0);
+                leftfr.setPower(0);
+                leftback.setPower(0);
+                return;
+
+            }
         }
 
-        }
 
+    }
 
-    public void ObjectDetectionTrue(boolean targetVisible)
+    public void EncoderStrafe(DcMotor rightback, DcMotor rightfr,DcMotor leftfr,DcMotor leftback)
     {
 
 
-        if(targetVisible==true)
-        {
+        rightback.setTargetPosition(rightback.getCurrentPosition() + STRAFE_TICKS);
+        rightback.setPower(0.25);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setPower(-0.25);
+        leftfr.setPower(0.25);
+        leftback.setPower(-0.25);
 
-            VectorF translation = lastLocation.getTranslation();
-            telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f", translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+        while (rightback.isBusy()) {
+            telemetry.addData("Right Motor Current: ", rightback.getCurrentPosition());
+            telemetry.addData("Right Motor Target: ", rightback.getTargetPosition());
+            telemetry.addData("Right Motor Ticks To Add: ", STRAFE_TICKS);
             telemetry.update();
+            if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 5)) {
+                rightback.setPower(0);
+                rightfr.setPower(0);
+                leftfr.setPower(0);
+                leftback.setPower(0);
+                sleep(3000);
+                return;
+
+            }
         }
+
+
+    }
+    public void targetTelemetry(boolean targetVisible)
+    {
+        if (targetVisible) {
+            telemetry.addData("Skystone Identified:", "True");
+            telemetry.update();
+
+        }
+        else {
+            telemetry.addData("Skystone Identified:", "False");
+            telemetry.update();
+
+        }
+
+return;
 
     }
 
 
 
+        // check all the trackable targets to see which one (if any) is visible.
+
+
+        // Provide feedback as to where the robot is located (if we know).
 
 
 
+
+
+
+
+    public void SkystoneLocation(int location) {
+
+
+        switch (location) {
+            case 0:
+                telemetry.addData("Skystone", "Not Detected");
+                telemetry.update();
+                break;
+            case 1:
+                telemetry.addData("Skystone: ", "Right");
+                telemetry.update();
+
+                break;
+            case 2:
+                telemetry.addData("Skystone: ", "Middle");
+                telemetry.update();
+                break;
+
+            case 3:
+                telemetry.addData("Skystone: ", "Left");
+                telemetry.update();
+                break;
+
+        }
+
+    }
 
 }
+
+
+
+
