@@ -48,8 +48,7 @@ public class Red_Second_Pickup extends LinearOpMode {
     private DcMotor rightfr = null;
     private DcMotor rightback = null;
 
-    private CRServo leftWheels = null;
-    private CRServo rightWheels = null;
+
     //private CRServo rackPinionUD = null;
     //private CRServo rackPinionLR = null;
 
@@ -81,8 +80,7 @@ public class Red_Second_Pickup extends LinearOpMode {
         rightfr = hardwareMap.get(DcMotor.class, "rightf");
         rightback = hardwareMap.get(DcMotor.class, "rightb");
 
-        leftWheels = hardwareMap.get(CRServo.class, "lw");
-        rightWheels = hardwareMap.get(CRServo.class, "rw");
+
         //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
         //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
 
@@ -97,8 +95,7 @@ public class Red_Second_Pickup extends LinearOpMode {
         rightfr.setDirection(DcMotor.Direction.REVERSE);
         rightback.setDirection(DcMotor.Direction.REVERSE);
 
-        leftWheels.setDirection(CRServo.Direction.REVERSE);
-        rightWheels.setDirection(CRServo.Direction.FORWARD);
+
         //rackPinionUD.setDirection(CRServo.Direction.FORWARD);
         //rackPinionLR.setDirection(CRServo.Direction.FORWARD);
 
@@ -229,6 +226,7 @@ public class Red_Second_Pickup extends LinearOpMode {
         }
     }
 
+
     public void tmove(double runSeconds, double presentRuntime, double turnPower, double straifPower, double tankPower)
 
     {
@@ -240,7 +238,7 @@ public class Red_Second_Pickup extends LinearOpMode {
         }
     }
 
-    public double bMove(double turnPower, double straifPower, double tankPower )
+    public void bMove(double turnPower, double straifPower, double tankPower )
     {
         double leftfrPower;
         double leftbackPower;
@@ -295,7 +293,6 @@ public class Red_Second_Pickup extends LinearOpMode {
         rightfr.setPower(rightfrPower);
         rightback.setPower(rightbackPower);
 
-        return 0;
 
     }
 }

@@ -168,7 +168,7 @@ public class SensorBNO055IMU extends LinearOpMode
     void AcuTurn(double Degrees, boolean Clockwise)
 
     {
-        Degrees = Degrees
+        Degrees = (Math.abs(Degrees))-5;
         double moved =0;
 
         double lastHead;
@@ -197,10 +197,37 @@ public class SensorBNO055IMU extends LinearOpMode
 
             if(Clockwise == true)
             {
-                leftfr.setPower(.2);
-                leftback.setPower(.2);
-                rightfr.setPower(.2);
-                rightback.setPower(.2);
+                if((Degrees-moved) >70)
+                {
+                    leftfr.setPower(.4);
+                    leftback.setPower(.4);
+                    rightfr.setPower(.4);
+                    rightback.setPower(.4);
+                }else {
+                    if((Degrees-moved) >40)
+                    {
+                        leftfr.setPower(.3);
+                        leftback.setPower(.3);
+                        rightfr.setPower(.3);
+                        rightback.setPower(.3);
+                    }else{
+                        if((Degrees-moved) >20)
+                        {
+                            leftfr.setPower(.2);
+                            leftback.setPower(.2);
+                            rightfr.setPower(.2);
+                            rightback.setPower(.2);
+                        }
+                        if((Degrees-moved) >10)
+                        {
+                            leftfr.setPower(.17);
+                            leftback.setPower(.17);
+                            rightfr.setPower(.17);
+                            rightback.setPower(.17);
+                        }
+                    }
+                }
+
             }else{
                 leftfr.setPower(-.2);
                 leftback.setPower(-.2);
