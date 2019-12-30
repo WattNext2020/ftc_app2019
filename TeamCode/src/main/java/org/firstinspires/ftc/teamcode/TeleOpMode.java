@@ -400,11 +400,12 @@ public class TeleOpMode extends LinearOpMode {
                 while (loopTimer2.seconds() <= 2) {
                     telemetry.addData("Only Running Outake"," ");
                     telemetry.update();
-                    loopTimer2.reset();
+
                 }
                 intakeArmPower = 0.3;
                 telemetry.addData("Setting Power for Intake Arm"," ");
                 telemetry.update();
+                loopTimer2.reset();
             }
 
             if(gather==0&&side==0)
