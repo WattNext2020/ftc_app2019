@@ -422,7 +422,14 @@ public class VuforiaSkyStone extends LinearOpMode {
                     telemetry.addData("Left:","True");
                     telemetry.update();
                 }
-                sleep(2000);
+                else{
+                    leftfr.setPower(0.3);
+                    leftback.setPower(0.3);
+                    rightfr.setPower(0.3);
+                    rightback.setPower(0.3);
+                    telemetry.addData("Forward:","True");
+                    telemetry.update();
+                }
                 stop();
                 //        double  xCoordinate = translation.get(0)/mmPerInch;
             }

@@ -408,7 +408,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 }
                 else {
                     sleep(2000);
-                    telemetry.addData("Did not Detect")
+                    telemetry.addData("Did not Detect", "");
                     stop();
                 }
      /*               targetVisible = false;
