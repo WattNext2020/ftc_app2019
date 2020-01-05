@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+
+
 @TeleOp(name= "TeleOpWork", group= "Linear Opmode")
 
 public class TELEOPWORK extends LinearOpMode {
@@ -299,50 +301,63 @@ public class TELEOPWORK extends LinearOpMode {
 
 
 
-            if (turnPower < -0.1) {
-                leftfrPower = Range.clip(-turnPower, -1.0, 1.0);
-                leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
-                rightfrPower = Range.clip(turnPower, -1.0, 1.0);
-                rightbackPower = Range.clip(turnPower, -1.0, 1.0);
-            } else if (turnPower > 0.1) {
-                leftfrPower = Range.clip(-turnPower, -1.0, 1.0);
-                leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
-                rightfrPower = Range.clip(turnPower, -1.0, 1.0);
-                rightbackPower = Range.clip(turnPower, -1.0, 1.0);
-            } else if (straifPower < -0.1) {
-                leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
-                leftbackPower = Range.clip(straifPower, -1.0, 1.0);
-                rightfrPower = Range.clip(straifPower, -1.0, 1.0);
-                rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
-            } else if (straifPower > 0.1) {
-                leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
-                leftbackPower = Range.clip(straifPower, -1.0, 1.0);
-                rightfrPower = Range.clip(straifPower, -1.0, 1.0);
-                rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
-            } else if (tankPower < -0.1) {
-                leftbackPower = Range.clip(tankPower, -1.0, 1.0);
-                rightbackPower = Range.clip(tankPower, -1.0, 1.0);
-                leftfrPower = Range.clip(tankPower, -1.0, 1.0);
-                rightfrPower = Range.clip(tankPower, -1.0, 1.0);
-            } else if (tankPower > 0.1) {
-                leftfrPower = Range.clip(tankPower, -1.0, 1.0);
-                rightfrPower = Range.clip(tankPower, -1.0, 1.0);
-                leftbackPower = Range.clip(tankPower, -1.0, 1.0);
-                rightbackPower = Range.clip(tankPower, -1.0, 1.0);
-            } else {
-                tankPower = 0.0;
-                turnPower = 0.0;
-                leftfrPower = Range.clip(tankPower, -1.0, 1.0);
-                rightfrPower = Range.clip(tankPower, -1.0, 1.0);
-                leftbackPower = Range.clip(tankPower, -1.0, 1.0);
-                rightbackPower = Range.clip(tankPower, -1.0, 1.0);
-            }
+//            if (turnPower < -0.1) {
+////                leftfrPower = Range.clip(-turnPower, -1.0, 1.0);
+////                leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
+////                rightfrPower = Range.clip(turnPower, -1.0, 1.0);
+////                rightbackPower = Range.clip(turnPower, -1.0, 1.0);
+////            } else if (turnPower > 0.1) {
+////                leftfrPower = Range.clip(-turnPower, -1.0, 1.0);
+////                leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
+////                rightfrPower = Range.clip(turnPower, -1.0, 1.0);
+////                rightbackPower = Range.clip(turnPower, -1.0, 1.0);
+////            } else if (straifPower < -0.1) {
+////                leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
+////                leftbackPower = Range.clip(straifPower, -1.0, 1.0);
+////                rightfrPower = Range.clip(straifPower, -1.0, 1.0);
+////                rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
+////            } else if (straifPower > 0.1) {
+////                leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
+////                leftbackPower = Range.clip(straifPower, -1.0, 1.0);
+////                rightfrPower = Range.clip(straifPower, -1.0, 1.0);
+////                rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
+////            } else if (tankPower < -0.1) {
+////                leftbackPower = Range.clip(tankPower, -1.0, 1.0);
+////                rightbackPower = Range.clip(tankPower, -1.0, 1.0);
+////                leftfrPower = Range.clip(tankPower, -1.0, 1.0);
+////                rightfrPower = Range.clip(tankPower, -1.0, 1.0);
+////            } else if (tankPower > 0.1) {
+////                leftfrPower = Range.clip(tankPower, -1.0, 1.0);
+////                rightfrPower = Range.clip(tankPower, -1.0, 1.0);
+////                leftbackPower = Range.clip(tankPower, -1.0, 1.0);
+////                rightbackPower = Range.clip(tankPower, -1.0, 1.0);
+////            } else {
+////                tankPower = 0.0;
+////                turnPower = 0.0;
+////                leftfrPower = Range.clip(tankPower, -1.0, 1.0);
+////                rightfrPower = Range.clip(tankPower, -1.0, 1.0);
+////                leftbackPower = Range.clip(tankPower, -1.0, 1.0);
+////                rightbackPower = Range.clipga(tankPower, -1.0, 1.0);
+////            }
 
+
+            double angle = Math.atan2(gamepad1.right_stick_y , gamepad1.right_stick_x);//Radians
+
+            rightfr.setPower(Range.clip(1*Math.cos(angle+(Math.PI/4))-Constants.CHANGE_DIR ,Constants.MIN_POWER, Constants.MAX_POWER));
+            leftfr.setPower(Range.clip(1*Math.sin(angle+(Math.PI/4))+Constants.CHANGE_DIR,Constants.MIN_POWER,Constants.MAX_POWER));
+            leftback.setPower(Range.clip(1*Math.sin(angle+(Math.PI/4))-Constants.CHANGE_DIR,Constants.MIN_POWER ,Constants.MAX_POWER));
+            rightback.setPower(Range.clip(1*Math.cos(angle+(Math.PI/4))+Constants.CHANGE_DIR,-Constants.MIN_POWER,Constants.MAX_POWER));
+
+            telemetry.addData("Angle", angle);
+            telemetry.addData("Left Front;", leftfr.getPower());
+            telemetry.addData("Right Front;", rightfr.getPower());
+            telemetry.addData("Left Back;", leftback.getPower());
+            telemetry.addData("Right Back;", rightback.getPower());
             //pickup mechanism
 
 
 
-            //   leftPower = Range.clip(gather, -1.0, 1.0);
+            //              leftPower = Range.clip(gather, -1.0, 1.0);
             //   rightPower = Range.clip(gather, -1.0, 1.0);
 
 
@@ -438,10 +453,7 @@ public class TELEOPWORK extends LinearOpMode {
 
 
             // Send calculated power to wheels
-            leftfr.setPower(leftfrPower);
-            leftback.setPower(leftbackPower);
-            rightfr.setPower(rightfrPower);
-            rightback.setPower(rightbackPower);
+
 
             //intake power
             leftWheels.setPower(1);
@@ -475,6 +487,7 @@ public class TELEOPWORK extends LinearOpMode {
             telemetry.update();
 
         }
+
     }
 }
 

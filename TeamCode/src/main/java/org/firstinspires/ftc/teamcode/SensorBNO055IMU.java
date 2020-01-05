@@ -28,6 +28,11 @@
  */
 
 package org.firstinspires.ftc.teamcode;
+import java.lang.*;
+import java.text.DecimalFormat;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -138,8 +143,9 @@ public class SensorBNO055IMU extends LinearOpMode
         while (opModeIsActive()) {
 
 
-            tmove(1, runtime.seconds(), -.4,0,0);
-            tmove(2, runtime.seconds(), 0,0,0);
+//            tmove(1, runtime.seconds(), -.4,0,0);
+//            tmove(2, runtime.seconds(), 0,0,0);
+            AcuMove(0,4);
 
             AcuTurn(180, true);
 
@@ -163,12 +169,191 @@ public class SensorBNO055IMU extends LinearOpMode
 
         }
     }
+    void AcuMove(double StraifMeters, double TankMeters)
+    {
+
+
+        telemetry.update();
+        TankMeters = TankMeters*10000;
+
+
+
+
+        double initXaccel = gravity.yAccel;
+        double Xaccel;
+        double Yaccel = 0;
+        double Speed =  0;
+
+
+        double lastTime = 0;
+        double lastSpeed = 0;
+
+
+        double movedTank = 0;
+
+        double runTimes = 0;
+        double initialTime =runtime.seconds();
+
+        while((runtime.seconds() - initialTime)< 5)
+        {
+            idle();
+        }
+
+
+
+
+        while(movedTank < TankMeters){
+            telemetry.update();
+            runTimes = runTimes +1;
+
+            Xaccel = (gravity.yAccel)-initXaccel;
+
+
+
+            if(Xaccel < .05 && Xaccel > -.05)
+            {
+                Xaccel = 0;
+                telemetry.addData("Zeroed:", "True");
+            }
+            else
+            {
+                telemetry.addData("Zeroed:", "False");
+            }
+
+
+
+            Speed = lastSpeed + (Xaccel/(runtime.seconds() - lastTime));
+            telemetry.addData("Speed:", Speed + "mm/s");
+            telemetry.addData("X acceleration:", Xaccel);
+            telemetry.addData("Y acceleration:", Yaccel);
+
+
+
+            telemetry.addData("Equation(Speed)=", lastSpeed+"+(" +Xaccel +"/(",runtime.seconds() + "-" +lastTime+"))" );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            telemetry.addData("Moved", movedTank/10000);
+
+            telemetry.addData("Times Run:", runTimes);
+
+            movedTank = movedTank + (Speed*(runtime.seconds() - lastTime));
+            telemetry.addData("Moved", movedTank);
+
+
+
+
+
+
+
+
+
+//            if ((movedTank/TankMeters) > .9){
+//                leftfr.setPower(.3);
+//                leftback.setPower(.3);
+//                rightback.setPower(-.3);
+//                rightfr.setPower(-.3);
+//
+//            }else{
+//                if((TankMeters - movedTank) > 4)
+//                {
+//                    leftfr.setPower(.7);
+//                    leftback.setPower(.7);
+//                    rightback.setPower(-.7);
+//                    rightfr.setPower(-.7);
+//                }else{
+//                    if((TankMeters - movedTank) > 3)
+//                    {
+//                        leftfr.setPower(.5);
+//                        leftback.setPower(.5);
+//                        rightback.setPower(-.5);
+//                        rightfr.setPower(-.5);
+//                    }else{
+//                        if ((TankMeters - movedTank) > 1)
+//                        {
+//                            leftfr.setPower(.3);
+//                            leftback.setPower(.3);
+//                            rightback.setPower(-.3);
+//                            rightfr.setPower(-.3);
+//                        }else{
+//
+//                            leftfr.setPower(.2);
+//                            leftback.setPower(.2);
+//                            rightback.setPower(-.2);
+//                            rightfr.setPower(-.2);
+//
+//                        }
+//                    }
+//                }
+//            }
+
+
+
+
+            lastTime = runtime.seconds();
+
+
+
+
+
+        }
+
+        telemetry.addData("Moved Post Finish", movedTank*1000);
+        telemetry.update();
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightback.setPower(0);
+        rightfr.setPower(0);
+
+
+        initialTime = runtime.seconds();
+        while((runtime.seconds() - initialTime)< 5)
+        {
+            idle();
+        }
+        return;
+
+
+
+
+
+
+
+
+
+    }
+        public static void roundAndPrint(double n, int round2DecimalPlace) {
+            String temp;
+            BigDecimal instance = new BigDecimal(Double.toString(n));
+            instance = instance.setScale(round2DecimalPlace, RoundingMode.HALF_UP);
+            
+        }
+
+
+
+
+
+
+
+
 
 
     void AcuTurn(double Degrees, boolean Clockwise)
 
     {
-        Degrees = (Math.abs(Degrees))-5;
+        Degrees = (Math.abs(Degrees));
         double moved =0;
 
         double lastHead;
@@ -179,12 +364,13 @@ public class SensorBNO055IMU extends LinearOpMode
         lastHead = angles.firstAngle;
 
 
-        while(moved <= Degrees)
+        while(moved <= Degrees-3 && moved >= Degrees+3)
         {
             telemetry.addData("Test Data",Degrees- Math.abs(angles.firstAngle - initHeading)   );
             telemetry.addData("Test Data 2", Math.abs(angles.firstAngle - initHeading)   );
             telemetry.addData("Moved: ", moved);
             telemetry.addData("Degrees: ", Degrees);
+            telemetry.addData("Velocity", imu.getVelocity());
             if (moved <= Degrees) {
                 telemetry.addData("WHILE: ", true);
 
@@ -220,10 +406,18 @@ public class SensorBNO055IMU extends LinearOpMode
                         }
                         if((Degrees-moved) >10)
                         {
-                            leftfr.setPower(.17);
-                            leftback.setPower(.17);
-                            rightfr.setPower(.17);
-                            rightback.setPower(.17);
+                            leftfr.setPower(.155);
+                            leftback.setPower(.155);
+                            rightfr.setPower(.155);
+                            rightback.setPower(.155);
+                        }else{
+                            if((Degrees-moved) >5)
+                            {
+                                leftfr.setPower(.15);
+                                leftback.setPower(.15);
+                                rightfr.setPower(.15);
+                                rightback.setPower(.15);
+                            }
                         }
                     }
                 }
