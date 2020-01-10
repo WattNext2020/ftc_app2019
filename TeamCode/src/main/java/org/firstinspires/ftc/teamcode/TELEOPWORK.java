@@ -348,6 +348,28 @@ public class TELEOPWORK extends LinearOpMode {
                 double max1;
                 double max2;
                 double max;
+                double average;
+
+                int temp = 0;
+
+                if (leftfrPower != 0)
+                {
+                    temp = temp +1;
+                }
+                if (leftbackPower != 0)
+                {
+                    temp = temp +1;
+                }
+                if (rightfrPower != 0)
+                {
+                    temp = temp +1;
+                }
+                if (rightbackPower != 0)
+                {
+                    temp = temp +1;
+                }
+
+                average = (leftfrPower+leftbackPower+rightfrPower+rightbackPower)/temp;
 
                 //get maximum power value
                 max1 = Math.max(Math.abs(rightfrPower), Math.abs(leftfrPower));
@@ -355,10 +377,10 @@ public class TELEOPWORK extends LinearOpMode {
 
                 max = Math.abs(Math.max(max1, max2));
 
-                rightfrPower = rightfrPower / max; //refactorization to a ccount for values greater than 1
-                leftfrPower = leftfrPower / max;
-                leftbackPower = leftbackPower / max;
-                rightbackPower = rightbackPower / max;
+                rightfrPower = rightfrPower / (max/average); //refactorization to a ccount for values greater than 1
+                leftfrPower = leftfrPower / (max/average);
+                leftbackPower = leftbackPower / (max/average);
+                rightbackPower = rightbackPower / (max/average);
 
 
                 rightfr.setPower(Range.clip(rightfrPower, Constants.MIN_POWER, Constants.MAX_POWER)); //Send Power
