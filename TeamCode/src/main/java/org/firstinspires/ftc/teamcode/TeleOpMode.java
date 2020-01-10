@@ -119,10 +119,8 @@ public class TeleOpMode extends LinearOpMode {
        public void pickUp{
            leftPower= 0.5;
            rightPower= -0.5;
-
        }
        public void putDown{
-
        } */
 
 // Wait for the game to start (driver presses PLAY)
@@ -231,7 +229,6 @@ public class TeleOpMode extends LinearOpMode {
                 leftPower=1;
                 rightPower=1;
             }
-
             if(gamepad2.b==true) {
                 leftPower = -1;
                 rightPower = -1;
@@ -256,17 +253,13 @@ public class TeleOpMode extends LinearOpMode {
 
         /*    if (gamepad2.x== true) {
                     if ((runtime.seconds() - lastCap) > .5) { //slow mode threshold
-
                         if (down == true) {
-
                             down = false;
                             lastCap = runtime.seconds();
                         } else {
-
                             down = true;
                             lastCap = runtime.seconds();
                         }
-
              */
 
 
@@ -325,7 +318,6 @@ public class TeleOpMode extends LinearOpMode {
             {
                 capStone.setPower(1);
             }
-
       */
 
 
@@ -378,8 +370,6 @@ public class TeleOpMode extends LinearOpMode {
             {
                 capStone.setPower(1);
             }
-
-
             if(gamepad2.b == true)
             {
                 capStone.setPower(-1);
@@ -446,9 +436,3 @@ public class TeleOpMode extends LinearOpMode {
         }
     }
 }
-
-
-
-
-
-

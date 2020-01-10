@@ -149,21 +149,22 @@ public class TensorFlowObjectDetectionTesting extends LinearOpMode {
         waitForStart();
         double tempTime1 = runtime.seconds();
 
+        while ((runtime.seconds()-tempTime1)< 4) {
+            leftfr.setPower(0.5);
+            leftback.setPower(0.5);
+            rightfr.setPower(0.5);
+            rightback.setPower(0.5);
+            telemetry.addData("Robot is:", "Moving");
+            telemetry.update();
+        }
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
+        telemetry.addData("Robot is:", "Stopped");
+        telemetry.update();
         while (opModeIsActive()) {
-                while ((runtime.seconds()-tempTime1)< 4) {
-                    leftfr.setPower(0.5);
-                    leftback.setPower(0.5);
-                    rightfr.setPower(0.5);
-                    rightback.setPower(0.5);
-                    telemetry.addData("Robot is:", "Moving");
-                    telemetry.update();
-                }
-                    leftfr.setPower(0);
-                    leftback.setPower(0);
-                    rightfr.setPower(0);
-                    rightback.setPower(0);
-                    telemetry.addData("Robot is:", "Stopped");
-                    telemetry.update();
+
 
 
 
