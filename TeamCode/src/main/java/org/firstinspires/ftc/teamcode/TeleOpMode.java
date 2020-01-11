@@ -234,30 +234,26 @@ public class TeleOpMode extends LinearOpMode {
 
 
 
-         if(gamepad2.b==true)
+         if(gamepad2.b)
             {
                 leftPower=0.75;
                 rightPower=0.75;
-
             }
-
-            if(gamepad2.a==true) {
+         if(gamepad2.a) {
                 leftPower = -0.75;
                 rightPower = -0.75;
             }
-            if(!gamepad2.a&&!gamepad2.b)
+         if(!gamepad2.a&&!gamepad2.b)
             {
                 leftPower=0;
                 rightPower=0;
-
             }
 
 
 
 
 
-   /*        double gather = gamepad2.right_stick_y;
-
+           double gather = gamepad2.right_stick_y;
 
             leftPower = Range.clip(gather, -1.0, 1.0);
             rightPower = Range.clip(gather, -1.0, 1.0);
@@ -267,7 +263,7 @@ public class TeleOpMode extends LinearOpMode {
                 rightPower = 0;
             }
 
-*/
+
 
 
 

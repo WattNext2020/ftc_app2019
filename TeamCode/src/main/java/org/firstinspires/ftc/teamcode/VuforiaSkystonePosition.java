@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -122,7 +123,10 @@ public class VuforiaSkystonePosition extends LinearOpMode {
     double rackPowerLR;
     int location = 0;
     int MOTOR_TICKS = 850;
-    int STRAFE_TICKS=400;
+    int STRAFE_TICKS = 400;
+    int TOSKYSTONE=400;
+
+    boolean first = true;
 
 
     /*
@@ -163,14 +167,14 @@ public class VuforiaSkystonePosition extends LinearOpMode {
     // Class Members
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
-     boolean skystoneVisible = false;
+    boolean skystoneVisible = false;
     private float phoneXRotate = 0;
     private float phoneYRotate = 0;
     private float phoneZRotate = 0;
 
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -363,8 +367,8 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         rightfr.setDirection(DcMotor.Direction.REVERSE);
         rightback.setDirection(DcMotor.Direction.REVERSE);
 
-        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftWheels.setDirection(CRServo.Direction.REVERSE);
         rightWheels.setDirection(CRServo.Direction.FORWARD);
@@ -378,8 +382,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
         leftHook.setPosition(0);
         rightHook.setPosition(0);
-        ElapsedTime LoopTimer=new ElapsedTime();
-
+        double initTime=0;
 
 
         // WARNING:
@@ -387,7 +390,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         // This sequence is used to enable the new remote DS Camera Preview feature to be used with this sample.
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
-
+        targetsSkyStone.activate();
         waitForStart();
         runtime.reset();
         // Note: To use the remote camera preview:
@@ -395,38 +398,119 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         // Tap the preview window to receive a fresh image.
 
         while (opModeIsActive() && !isStopRequested()) {
-            targetsSkyStone.activate();
-           EncoderMove(rightback, rightfr, leftfr, leftback);
-                LoopTimer.startTime();
-            while(LoopTimer.seconds()<2) {
-                telemetry.addLine("Scannng Position 1");
-                for (VuforiaTrackable trackable : allTrackables) {
-                    if (trackable.getName().equals("Stone Target")) {
-                        telemetry.addLine("Skystone is Position 1");
-                        skystoneVisible = true;
-                        location = 1;
-               //         SkystoneLocation(location);
-                        sleep(2000);
-                        stop();  //place pickup for 1 here
-                    }
-                    else {
-                        skystoneVisible = false;
-                        telemetry.addLine("Skystone Not 1");
+
+            EncoderMove(rightback, rightfr, leftfr, leftback);
+            ElapsedTime LoopTimer = new ElapsedTime();
+            LoopTimer.reset();
+            LoopTimer.startTime();
+                while (LoopTimer.seconds()<2) {
+                    for (VuforiaTrackable trackable : allTrackables) {
+                        if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                            telemetry.addData("Skystone:", "Visible Position 1");
+                            skystoneVisible = true;
+                            location = 1;
+                            MovingtoSkystone(rightback, rightfr, leftfr, leftback);
+                            telemetry.update();
+                            sleep(2000);
+                            stop(); //place pickup 1 here
+                            // getUpdatedRobotLocation() will return null if no new information is available since
+                            // the last time that call was made, or if the trackable is not currently visible.
+                            break;
+                        }
                     }
                 }
+            // Provide feedback as to where the robot is located (if we know).
+
+            if (skystoneVisible == false) {
+                LoopTimer.reset();
+                telemetry.addData("Not in Position 1", " ");
+                telemetry.update();
+                EncoderStrafe(rightback, rightfr, leftfr, leftback, initTime);
+                ElapsedTime LoopTimer2 = new ElapsedTime();
+                LoopTimer2.reset();
+                LoopTimer2.startTime();
+                while (LoopTimer2.seconds() < 2) {
+                    for (VuforiaTrackable trackable : allTrackables) {
+                        if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                            telemetry.addData("Skystone:", "Visible Position 2");
+                            skystoneVisible = true;
+                            location = 2;
+                            telemetry.update();
+                            sleep(2000);
+                            stop(); //place pickup 1 here
+                            // getUpdatedRobotLocation() will return null if no new information is available since
+                            // the last time that call was made, or if the trackable is not currently visible.
+                            break;
+                        }
+                    }
+                }
+                if (skystoneVisible == false)
+                {
+                    initTime=0;
+                    EncoderStrafe(rightback, rightfr, leftfr, leftback, initTime);
+                    telemetry.addData("Skystone:", "Assumed Position 3");
+                    skystoneVisible = true;
+                    location = 3;
+                    telemetry.update();
+                    stop();
+
+
+                }
+
+
             }
+
+
+        }
+
+
+
+
+
+        /*LoopTimer.startTime();
+                telemetry.addLine("Scanning Position 1");
+
+                /*
+
+                }
+            }
+
+                /*
+                for (VuforiaTrackable trackable : allTrackables) {
+                    if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                        telemetry.addData("Visible Target", trackable.getName());
+                        telemetry.update();
+                   /*     if (trackable.getName().equals("Stone Target")) {
+                            telemetry.addLine("Skystone is Position 1");
+                            skystoneVisible = true;
+                            location = 1;
+                            //         SkystoneLocation(location);
+                            sleep(2000);
+                            stop();  //place pickup for 1 here
+                        }
+
+                    */
+
+                   /* else {
+                        skystoneVisible = false;
+                        telemetry.addLine("Skystone Not 1");
+                        telemetry.update();
+                    }
+                }
+                /*
+            stop();
             LoopTimer.reset();
             sleep(2000);
-                    EncoderStrafe(rightback, rightfr, leftfr, leftback);
-                    LoopTimer.startTime();
-            while(LoopTimer.seconds()<2) {
+            EncoderStrafe(rightback, rightfr, leftfr, leftback);
+            LoopTimer.startTime();
+            while (LoopTimer.seconds() < 2) {
                 telemetry.addLine("Scannng Position 2");
                 for (VuforiaTrackable trackable : allTrackables) {
                     if (trackable.getName().equals("Stone Target")) {
                         telemetry.addLine("Skystone is Position 2");
                         skystoneVisible = true;
                         location = 2;
-                   //     SkystoneLocation(location);
+                        //     SkystoneLocation(location);
                         sleep(2000);
                         stop(); //place pickup for 2 here
                     } else {
@@ -434,40 +518,38 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                         telemetry.addLine("Skystone: " + "Not 2");
                     }
                 }
-        }
+            }
 
             LoopTimer.reset();
             EncoderStrafe(rightback, rightfr, leftfr, leftback);
             LoopTimer.startTime();
-            while(LoopTimer.seconds()<2) {
+            while (LoopTimer.seconds() < 2) {
                 telemetry.addLine("Scannng Position 3");
                 for (VuforiaTrackable trackable : allTrackables) {
                     if (trackable.getName().equals("Stone Target")) {
                         telemetry.addLine("Skystone is Position 3");
                         skystoneVisible = true;
                         location = 3;
-                      //  SkystoneLocation(location);
+                        //  SkystoneLocation(location);
                         sleep(2000);
                         stop(); //place pickup for 3 here
-                    }
-                    else {
-                       telemetry.addLine("Skystone Not Detected: Backup Route");
+                    } else {
+                        telemetry.addLine("Skystone Not Detected: Backup Route");
                     }
                 }
-            }
-            stop();
+
+                 */
+    }
 
 
-            }
-        }
+    // }
+    // }
 
 
-        // }
-        // }
+    public void EncoderMove(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback) {
 
-
-    public void EncoderMove(DcMotor rightback, DcMotor rightfr,DcMotor leftfr,DcMotor leftback)
-    {
+        rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightback.setTargetPosition(rightback.getCurrentPosition() + MOTOR_TICKS);
         rightback.setPower(0.35);
         rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -477,12 +559,8 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
 
         while (rightback.isBusy()) {
-            telemetry.addData("Right Motor Current: ", rightback.getCurrentPosition());
-            telemetry.addData("Right Motor Target: ", rightback.getTargetPosition());
-            telemetry.addData("Right Motor Ticks To Add: ", MOTOR_TICKS);
-            telemetry.update();
 
-            if(rightback.getCurrentPosition()>= (rightback.getTargetPosition()-400)) {
+            if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 400)) {
                 rightback.setPower(0.2);
                 rightfr.setPower(0.2);
                 leftfr.setPower(0.2);
@@ -498,33 +576,78 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                     rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                     rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                     leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    sleep(3000);
+                    rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     return;
                 }
             }
-            }
-
+        }
 
 
     }
-
-    public void EncoderStrafe(DcMotor rightback, DcMotor rightfr,DcMotor leftfr,DcMotor leftback)
+    public void MovingtoSkystone(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback)
     {
 
-
-        rightback.setTargetPosition(-rightback.getCurrentPosition() - STRAFE_TICKS);
-        rightback.setPower(-0.2);
+        rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightback.setTargetPosition(rightback.getCurrentPosition() + TOSKYSTONE);
+        rightback.setPower(0.2);
         rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightfr.setPower(0.2);
-        leftfr.setPower(-0.2);
+        leftfr.setPower(0.2);
         leftback.setPower(0.2);
 
+
         while (rightback.isBusy()) {
-            telemetry.addData("Right Motor Current: ", -rightback.getCurrentPosition());
-            telemetry.addData("Right Motor Target: ", rightback.getTargetPosition());
-            telemetry.addData("Right Motor Ticks To Add: ", -STRAFE_TICKS);
+
+                if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 5)) {
+                    leftback.setPower(0);
+                    rightback.setPower(0);
+                    rightfr.setPower(0);
+                    leftfr.setPower(0);
+                    leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    return;
+                }
+            }
+
+    }
+
+    public void EncoderStrafe(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback, double initTime) {
+
+        initTime=runtime.seconds();
+        rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        while((runtime.seconds()-initTime)<1.7)
+        {
+            rightback.setPower(-0.3);
+            rightfr.setPower(0.3);
+            leftfr.setPower(-0.3);
+            leftback.setPower(0.45);
+            telemetry.addData("Strafing"," ");
             telemetry.update();
-            if (-rightback.getCurrentPosition() >= (-rightback.getTargetPosition() + 5)) {
+        }
+        rightback.setPower(0);
+        rightfr.setPower(0);
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        return;
+
+  /*      rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightback.setTargetPosition(-rightback.getCurrentPosition() - STRAFE_TICKS);
+        rightback.setPower(-0.3);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setPower(0.3);
+        leftfr.setPower(-0.3);
+        leftback.setPower(0.3);
+
+        while (rightback.isBusy()) {
+            telemetry.addData("Right Motor Curresnt: ", rightback.getCurrentPosition());
+            telemetry.addData("Right Motor Target: ", rightback.getTargetPosition());
+            telemetry.addData("Right Motor Ticks To Add: ", STRAFE_TICKS);
+            telemetry.update();
+            if (rightback.getCurrentPosition() <= (rightback.getTargetPosition() + 10)) {
                 rightback.setPower(0);
                 rightfr.setPower(0);
                 leftfr.setPower(0);
@@ -533,35 +656,32 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                return;
+
             }
         }
-
+        */
 
     }
-    public void targetTelemetry(boolean targetVisible)
-    {
+
+
+    public void targetTelemetry(boolean targetVisible) {
         if (targetVisible) {
             telemetry.addData("Skystone Identified:", "True");
             telemetry.update();
 
-        }
-        else {
+        } else {
             telemetry.addData("Skystone Identified:", "False");
             telemetry.update();
 
         }
 
-return;
+        return;
 
     }
+    // check all the trackable targets to see which one (if any) is visible.
 
 
-
-        // check all the trackable targets to see which one (if any) is visible.
-
-
-        // Provide feedback as to where the robot is located (if we know).
+    // Provide feedback as to where the robot is located (if we know).
 
 
 
@@ -595,8 +715,14 @@ return;
         }
 */
 
-
 }
+
+
+
+
+
+
+
 
 
 
