@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -9,11 +10,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-
 @TeleOp(name= "TeleOp", group= "Linear Opmode")
-
 public class TELEOPWORK extends LinearOpMode {
-//@Disabled
+
 
 
     // Declare OpMode members.
@@ -43,6 +42,8 @@ public class TELEOPWORK extends LinearOpMode {
 
     double cap;
 
+    double wheelPower =0;
+
 
     double lastSlow = 0;
 
@@ -53,7 +54,8 @@ public class TELEOPWORK extends LinearOpMode {
     private Servo rightHook;
 
     boolean first = true;
-
+boolean gatherA;
+boolean gatherB;
 
     boolean rhook;
     boolean lhook;
@@ -159,6 +161,23 @@ public class TELEOPWORK extends LinearOpMode {
 
             }
 
+            //intake mechanism
+
+            wheelPower=gamepad2.right_stick_y;
+
+            if(wheelPower>0.1)
+            {
+                wheelPower=1;
+            }
+            if(wheelPower<-0.1)
+            {
+                wheelPower=-1;
+            }
+
+
+
+
+
 
             if (gamepad2.right_bumper == true ) {
                 if ((runtime.seconds() - lastrhook) > .5) { //slow mode threshold
@@ -221,7 +240,7 @@ public class TELEOPWORK extends LinearOpMode {
 
 
             }
-            if(gamepad2.x == true)
+ /*           if(gamepad2.x == true)
             {
                 if ((runtime.seconds()-lastTank) > .5)
                 {
@@ -235,7 +254,7 @@ public class TELEOPWORK extends LinearOpMode {
                     }
                 }
             }
-
+*/
             if (zeroBrake == true) {
                 leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //Makes motors brake when set to 0
                 leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -320,22 +339,26 @@ public class TELEOPWORK extends LinearOpMode {
             }
 
             //pickup mechanism
-            double gather = gamepad2.right_stick_y;
 
-            leftPower = Range.clip(gather, -1.0, 1.0);
-            rightPower = Range.clip(gather, -1.0, 1.0);
 
-            cap = 0;
-            if(gamepad2.b == true)
+
+            //   leftPower = Range.clip(gather, -1.0, 1.0);
+         //   rightPower = Range.clip(gather, -1.0, 1.0);
+
+
+
+   /*         if(gamepad2.b == true)
             {
                 cap = -1;
             }
-
 
             if(gamepad2.a == true)
             {
                 cap = 1;
             }
+*/
+
+            cap=-gamepad2.left_stick_y *0.75;
 
 
 
@@ -353,9 +376,7 @@ public class TELEOPWORK extends LinearOpMode {
 
 
 
-
-
-            double upDown = cap*-.3;
+            double upDown = cap;
 
             if (upDown > 0.0){
                 rackPowerUD = Range.clip(upDown, -1.0, 1.0);
@@ -368,7 +389,7 @@ public class TELEOPWORK extends LinearOpMode {
                 rackPowerUD = 0.0;
             }
 
-            double side = gamepad2.left_stick_x;
+            double side = cap;
 
             if (side > 0.0){
                 rackPowerLR = Range.clip(side, -1.0, 1.0);
@@ -381,6 +402,7 @@ public class TELEOPWORK extends LinearOpMode {
                 rackPowerLR = 0.0;
             }
 
+
             // Send calculated power to wheels
             leftfr.setPower(leftfrPower);
             leftback.setPower(leftbackPower);
@@ -388,8 +410,8 @@ public class TELEOPWORK extends LinearOpMode {
             rightback.setPower(rightbackPower);
 
             //intake power
-            leftWheels.setPower(leftPower);
-            rightWheels.setPower(rightPower);
+            leftWheels.setPower(wheelPower);
+            rightWheels.setPower(wheelPower);
 
             //arm movement power
             rackPinionLR.setPower(rackPowerLR);
@@ -407,6 +429,10 @@ public class TELEOPWORK extends LinearOpMode {
             telemetry.addData("Servos", "left wheels (%.2f), right wheel (%.2f)", leftPower, rightPower);
             telemetry.addData("lhook", lhook);
             telemetry.addData("rhook", rhook);
+            telemetry.addData("Value:",wheelPower);
+            telemetry.addData("A:",gamepad2.a);
+            telemetry.addData("B:",gamepad2.b);
+
 
 
             // Rev2mDistanceSensor specific methods.

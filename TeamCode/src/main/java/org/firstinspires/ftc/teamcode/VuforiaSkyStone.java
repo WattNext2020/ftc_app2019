@@ -419,7 +419,7 @@ public class VuforiaSkyStone extends LinearOpMode {
                     leftback.setPower(0.3);
                     rightfr.setPower(0.3);
                     rightback.setPower(-0.3);
-                    telemetry.addData("Left:","True");
+                    telemetry.addData("Strafing Left:","True");
                     telemetry.update();
                 }
                 sleep(2000);
