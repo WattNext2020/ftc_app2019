@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -51,7 +50,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="SecondBotTeleOp", group="Linear Opmode")
-public class MonsterTelOp extends LinearOpMode {
+public class SecondBotTeleOp extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -59,6 +58,12 @@ public class MonsterTelOp extends LinearOpMode {
     private DcMotor rightRDrive = null;
     private DcMotor leftFDrive = null;
     private DcMotor rightFDrive = null;
+
+
+    double leftRPower = 0;
+    double rightRPower = 0;
+    double leftFPower = 0;
+    double rightFPower = 0;
 
 
     @Override
@@ -76,9 +81,9 @@ public class MonsterTelOp extends LinearOpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftRDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftRDrive.setDirection(DcMotor.Direction.FORWARD);
         rightRDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftFDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftFDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
@@ -89,50 +94,55 @@ public class MonsterTelOp extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            double leftRPower = 0;
-            double rightRPower = 0;
-            double leftFPower = 0;
-            double rightFPower = 0;
+
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
-            double rightXdrive = gamepad1.right_stick_y;
-            double leftXdrive = -gamepad1.left_stick_y;
-            double rightYdrive = gamepad1.right_stick_y;
-            double leftYdrive = -gamepad1.left_stick_y;
+            double strafePower = gamepad1.right_stick_x;
+            double tankPower = gamepad1.right_stick_y;
+            double turnPower = gamepad1.left_stick_x;
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
 
-            if(gamepad1.right_stick_y > 1) {
-                leftFPower = Range.clip(leftXdrive, -1.0, 1.0);
-                rightFPower = Range.clip(rightXdrive, -1.0, 1.0);
-                leftRPower = Range.clip(leftYdrive, -1.0, 1.0);
-                rightRPower = Range.clip(rightYdrive, -1.0, 1.0);
+            if(turnPower < -0.1){
+                leftFPower = Range.clip(-turnPower, -1.0, 1.0);
+                leftRPower = Range.clip(-turnPower, -1.0, 1.0);
+                rightFPower = Range.clip(turnPower, -1.0, 1.0);
+                rightRPower = Range.clip(turnPower, -1.0, 1.0);
             }
-            if(gamepad1.right_stick_y < 1) {
-                leftFPower = Range.clip(leftXdrive, -1.0, 1.0);
-                rightFPower = Range.clip(rightXdrive, -1.0, 1.0);
-                leftRPower = Range.clip(leftYdrive, -1.0, 1.0);
-                rightRPower = Range.clip(rightYdrive, -1.0, 1.0);
+            if(turnPower > 0.1){
+                leftFPower = Range.clip(-turnPower, -1.0, 1.0);
+                leftRPower = Range.clip(-turnPower, -1.0, 1.0);
+                rightFPower = Range.clip(turnPower, -1.0, 1.0);
+                rightRPower = Range.clip(turnPower, -1.0, 1.0);
             }
-            if(gamepad1.right_stick_x > 1) {
-                leftFPower = Range.clip(leftXdrive, -1.0, 1.0);
-                rightFPower = Range.clip(rightXdrive, -1.0, 1.0);
-                leftRPower = Range.clip(leftYdrive, -1.0, 1.0);
-                rightRPower = Range.clip(rightYdrive, -1.0, 1.0);
+            if(strafePower < -0.1){
+                leftFPower = Range.clip(-strafePower, -1.0, 1.0);
+                leftRPower = Range.clip(strafePower, -1.0, 1.0);
+                rightFPower = Range.clip(strafePower, -1.0, 1.0);
+                rightRPower = Range.clip(-strafePower, -1.0, 1.0);
             }
-            if(gamepad1.right_stick_x < 1) {
-                leftFPower = Range.clip(leftXdrive, -1.0, 1.0);
-                rightFPower = Range.clip(rightXdrive, -1.0, 1.0);
-                leftRPower = Range.clip(leftYdrive, -1.0, 1.0);
-                rightRPower = Range.clip(rightYdrive, -1.0, 1.0);
+            if(strafePower > 0.1){
+                leftFPower = Range.clip(-strafePower, -1.0, 1.0);
+                leftRPower = Range.clip(strafePower, -1.0, 1.0);
+                rightFPower = Range.clip(strafePower, -1.0, 1.0);
+                rightRPower = Range.clip(-strafePower, -1.0, 1.0);
             }
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
+            if(tankPower < -0.1){
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+            }
+            if(tankPower > 0.1){
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+            }
+
 
             // Send calculated power to wheels
             leftFDrive.setPower(leftFPower);
