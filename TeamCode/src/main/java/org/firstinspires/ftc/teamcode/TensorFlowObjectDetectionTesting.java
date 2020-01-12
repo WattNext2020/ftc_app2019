@@ -74,6 +74,8 @@ public class TensorFlowObjectDetectionTesting extends LinearOpMode {
     double leftbackPower;
     double rightfrPower;
     double rightbackPower;
+    int location = 0;
+    int MOTOR_TICKS = 850;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -147,79 +149,150 @@ public class TensorFlowObjectDetectionTesting extends LinearOpMode {
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
         waitForStart();
-        double tempTime1 = runtime.seconds();
+        ElapsedTime LoopTimer=new ElapsedTime();
 
-        while ((runtime.seconds()-tempTime1)< 4) {
-            leftfr.setPower(0.5);
-            leftback.setPower(0.5);
-            rightfr.setPower(0.5);
-            rightback.setPower(0.5);
-            telemetry.addData("Robot is:", "Moving");
-            telemetry.update();
-        }
-        leftfr.setPower(0);
-        leftback.setPower(0);
-        rightfr.setPower(0);
-        rightback.setPower(0);
-        telemetry.addData("Robot is:", "Stopped");
-        telemetry.update();
+
         while (opModeIsActive()) {
 
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    telemetry.update();
+                    for (Recognition recognition : updatedRecognitions) {
+
+                        EncoderMove(rightback, rightfr, leftfr, leftback);
+                        LoopTimer.startTime();
+//                        sleep(2000);
+                        if(recognition.getLabel()  != "Skystone") {
+                            while (LoopTimer.seconds() < 2){
+                                leftfr.setPower(-0.5);
+                                leftback.setPower(0.5);
+                                rightfr.setPower(0.5);
+                                rightback.setPower(-0.5);
+                                telemetry.addData("Robot is: ", "Strafing");
+                            }
+                            leftfr.setPower(0);
+                            leftback.setPower(0);
+                            rightfr.setPower(0);
+                            rightback.setPower(0);
+                            telemetry.addData("Skystone: ", recognition.getLabel());
+                            telemetry.addData("Location: ", location);
+                            telemetry.update();
+                        }
+                        else{
+                            while (LoopTimer.seconds() < 1){
+                                leftfr.setPower(0.5);
+                                leftback.setPower(0.5);
+                                rightfr.setPower(0.5);
+                                rightback.setPower(0.5);
+                            }
+                            leftfr.setPower(0);
+                            leftback.setPower(0);
+                            rightfr.setPower(0);
+                            rightback.setPower(0);
+                            location = 1;
+                            telemetry.addData("Skystone: ", recognition.getLabel());
+                            telemetry.addData("Location: ", location);
+                            telemetry.update();
+                            sleep(1000);
+                          }
+
+                          sleep(1000);
+
+                          LoopTimer.reset();
+                        if(recognition.getLabel()  != "Skystone") {
+                            while (LoopTimer.seconds() < 2){
+                                leftfr.setPower(0.5);
+                                leftback.setPower(-0.5);
+                                rightfr.setPower(-0.5);
+                                rightback.setPower(0.5);
+                            }
+                            while(LoopTimer.seconds() < 3){
+                                leftfr.setPower(0.5);
+                                leftback.setPower(0.5);
+                                rightfr.setPower(0.5);
+                                rightback.setPower(0.5);
+                            }
+                            leftfr.setPower(0);
+                            leftback.setPower(0);
+                            rightfr.setPower(0);
+                            rightback.setPower(0);
+                            location = 3;
+                            telemetry.addData("Skystone: ", recognition.getLabel());
+                            telemetry.addData("Location: ", location);
+                            telemetry.update();
+                            sleep(1000);
+                        }
+                        else{
+                            while(LoopTimer.seconds() < 1){
+                                leftfr.setPower(0.5);
+                                leftback.setPower(0.5);
+                                rightfr.setPower(0.5);
+                                rightback.setPower(0.5);
+                            }
+                            leftfr.setPower(0);
+                            leftback.setPower(0);
+                            rightfr.setPower(0);
+                            rightback.setPower(0);
+                            location = 2;
+                            telemetry.addData("Skystone: ", recognition.getLabel());
+                            telemetry.addData("Location: ", location);
+                            telemetry.update();
+                            sleep(1000);
+                        }
+                        telemetry.addData("time1", "= " + LoopTimer);
+                        telemetry.update();
+                    }
+
+                }
+            }
+        }
 
 
 
-//            if (tfod != null) {
-//                // getUpdatedRecognitions() will return null if no new information is available since
-//                // the last time that call was made.
-//                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-//
-//                if (updatedRecognitions != null) {
-//                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-//
-//                      // step through the list of recognitions and display boundary info.
-//                      int i = 0;
-//                      Boolean isSkystone = false;
-//                      for (Recognition recognition : updatedRecognitions) {
-//                          // move forward until block is 75% of image
-//                          float highRatio = recognition.getHeight()/recognition.getImageHeight();
-//                          float wideRatio = recognition.getWidth()/recognition.getImageWidth();
-//                          telemetry.addData("Ratio: ", wideRatio);
-//                          telemetry.update();
-//
-//
-//                          while (recognition.getLabel() != "Skystone"){
-//                              leftfr.setPower(0.5);
-//                              leftback.setPower(-0.5);
-//                              rightfr.setPower(-0.5);
-//                              rightback.setPower(0.5);
-//                          }
-//                          leftfr.setPower(0);
-//                          leftback.setPower(0);
-//                          rightfr.setPower(0);
-//                          rightback.setPower(0);
-//                          sleep(2000);
-//
-//                        telemetry.addData("time1", "= " + tempTime1);
-//                        telemetry.addData("stone", "skystone?: " + isSkystone);
-//                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-//                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-//                                          recognition.getLeft(), recognition.getTop());
-//                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-//                                recognition.getRight(), recognition.getBottom()); }
-//
-//                }
-//                telemetry.update();
-//            }
-//        }
-//
-//
-//
-//        if (tfod != null) {
-//            tfod.shutdown();
+        if (tfod != null) {
+            tfod.shutdown();
         }
     }
 
-    public void EncoderMove(DcMotor rightback, DcMotor rightfr, DcMotor leftback, DcMotor leftfr){
+    public void EncoderMove(DcMotor rightback, DcMotor rightfr,DcMotor leftfr,DcMotor leftback)
+    {
+        rightback.setTargetPosition(rightback.getCurrentPosition() + MOTOR_TICKS);
+        rightback.setPower(0.25);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setPower(0.25);
+        leftfr.setPower(0.25);
+        leftback.setPower(0.25);
+
+
+        while (rightback.isBusy()) {
+
+            if(rightback.getCurrentPosition()>= (rightback.getTargetPosition()-400)) {
+                rightback.setPower(0.2);
+                rightfr.setPower(0.2);
+                leftfr.setPower(0.2);
+                leftback.setPower(0.2);
+
+
+                if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 5)) {
+                    leftback.setPower(0);
+                    rightback.setPower(0);
+                    rightfr.setPower(0);
+                    leftfr.setPower(0);
+                    leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                    sleep(3000);
+                    return;
+                }
+            }
+        }
+        rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
