@@ -10,8 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-
-
+import org.firstinspires.ftc.robotcore.external.Const;
 
 
 @TeleOp(name= "TeleOpWork", group= "Linear Opmode")
@@ -26,6 +25,9 @@ public class TELEOPWORK extends LinearOpMode {
     private DcMotor leftback = null;
     private DcMotor rightfr = null;
     private DcMotor rightback = null;
+
+
+    boolean overFlow;
 
     private CRServo leftWheels = null;
     private CRServo rightWheels = null;
@@ -275,6 +277,24 @@ public class TELEOPWORK extends LinearOpMode {
 
 
 
+            if(gamepad1.right_stick_y < .1 && gamepad1.right_stick_y > -.1)
+            {
+                gamepad1.right_stick_y = 0;
+            }
+            if(gamepad1.right_stick_x < .1 && gamepad1.right_stick_x > -.1)
+            {
+                gamepad1.right_stick_x = 0;
+            }
+            if(gamepad1.left_stick_y < .1 && gamepad1.left_stick_y > -.1)
+            {
+                gamepad1.left_stick_y = 0;
+            }
+            if(gamepad1.left_stick_x < .1 && gamepad1.left_stick_x > -.1)
+            {
+                gamepad1.left_stick_x = 0;
+            }
+
+
 
             if (slowMode == true) {
                 straifPower = straifPower * .5;
@@ -300,102 +320,104 @@ public class TELEOPWORK extends LinearOpMode {
             }
 
 
+            double counter =0;
+
+
+            double Vx = -(Math.atan2(gamepad1.left_stick_x, gamepad1.left_stick_y)*180/Math.PI);
+            double Vy = gamepad1.right_stick_y;
+
+            double Turn = -gamepad1.right_stick_x;
+
+            leftfrPower = Vy + Vx + Constants.WHEEL_DIST_H*Turn + Constants.WHEEL_DIST_V*Turn;
+            rightfrPower = Vy -Vx - Constants.WHEEL_DIST_H*Turn - Constants.WHEEL_DIST_V*Turn;
+            leftbackPower = Vy + Vx -Constants.WHEEL_DIST_H*Turn - Constants.WHEEL_DIST_V*Turn;
+            rightbackPower = Vy-Vx +Constants.WHEEL_DIST_H*Turn + Constants.WHEEL_DIST_V*Turn;
 
 
 
-//
 
-
-
-
-
-
-
-            double Theta = Math.atan2(gamepad1.right_stick_y,gamepad1.right_stick_y)*180/Math.PI;
-            double Turn =Math.atan2(gamepad1.left_stick_y,gamepad1.left_stick_y)*180/Math.PI;
-
-            double Vx = gamepad1.right_stick_y;
-            double Vy = gamepad1.right_stick_x;
-
-            if (-.1< Vx && Vx < .1)
-            {                       //Dead Zone
-                Vx = 0;
-            }
-
-
-            if (-.1< Vy && Vy < .1)
+            if (gamepad1.right_stick_x != 0)
             {
-                Vy = 0;
+                counter = counter+1;
             }
-
-
-            if(Vx == 0 && Vy == 0)    //Accounting for error given
+            if (gamepad1.right_stick_y != 0)
             {
-                rightfrPower = 0;
-                leftfrPower = 0;
-                leftbackPower = 0;
-                rightbackPower = 0;
+                counter = counter+1;
             }
-            else {
-                rightfrPower = Vx - Vy - Constants.WHEEL_DIST_V * Turn - Constants.WHEEL_DIST_H * Turn;
-                leftfrPower = Vx + Vy + Constants.WHEEL_DIST_V * Turn + Constants.WHEEL_DIST_H * Turn;
-                leftbackPower = Vx + Vy - Constants.WHEEL_DIST_V * Turn - Constants.WHEEL_DIST_H * Turn;
-                rightbackPower = Vx - Vy + Constants.WHEEL_DIST_V * Turn + Constants.WHEEL_DIST_H * Turn;
-                telemetry.addData("Initial Left Front ;", leftfrPower);   //Check Power`
-                telemetry.addData("Initial Right Front;", rightfrPower);
-                telemetry.addData("Initial Left Back;", leftbackPower);
-                telemetry.addData("Initial Right Back;", rightbackPower);
-                double max1;
-                double max2;
-                double max;
-                double average;
+            if (gamepad1.left_stick_x != 0)
+            {
+                counter = counter+1;
+            }
+            if (gamepad1.left_stick_y != 0)
+            {
+                counter = counter+1;
+            }
 
-                int temp = 0;
-
-                if (leftfrPower != 0)
-                {
-                    temp = temp +1;
-                }
-                if (leftbackPower != 0)
-                {
-                    temp = temp +1;
-                }
-                if (rightfrPower != 0)
-                {
-                    temp = temp +1;
-                }
-                if (rightbackPower != 0)
-                {
-                    temp = temp +1;
-                }
-
-                average = (leftfrPower+leftbackPower+rightfrPower+rightbackPower)/temp;
-
-                //get maximum power value
-                max1 = Math.max(Math.abs(rightfrPower), Math.abs(leftfrPower));
-                max2 = Math.max(Math.abs(leftbackPower), Math.abs(rightbackPower));
-
-                max = Math.abs(Math.max(max1, max2));
-
-                rightfrPower = rightfrPower / (max/average); //refactorization to a ccount for values greater than 1
-                leftfrPower = leftfrPower / (max/average);
-                leftbackPower = leftbackPower / (max/average);
-                rightbackPower = rightbackPower / (max/average);
+            if (gamepad1.right_stick_x != 0 &&gamepad1.right_stick_y != 0)
+            {
+                counter = counter - .75;
+            }
+            if (gamepad1.left_stick_x != 0 &&gamepad1.left_stick_y != 0)
+            {
+                counter = counter - .75;
+            }
 
 
-                rightfr.setPower(Range.clip(rightfrPower, Constants.MIN_POWER, Constants.MAX_POWER)); //Send Power
-                leftfr.setPower(Range.clip(leftfrPower, Constants.MIN_POWER, Constants.MAX_POWER));
-                leftback.setPower(Range.clip(leftbackPower, Constants.MIN_POWER, Constants.MAX_POWER));
-                rightback.setPower(Range.clip(rightbackPower, -Constants.MIN_POWER, Constants.MAX_POWER));
+
+            telemetry.addData("Counter:", counter);
+
+            double max1;
+            double max2;
+            double max;
+
+            double average;
+
+            max1 = Math.max(Math.abs(leftfrPower), Math.abs(leftbackPower));
+            max2 = Math.max(Math.abs(rightfrPower),Math.abs(rightbackPower));
+
+            max = Math.max(max1, max2);
+
+            average =  Math.abs((gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.right_stick_y)/ counter);
+
+            telemetry.addData("Average:", average);
+            leftfrPower = leftfrPower/(Math.abs(max));
+            leftbackPower = leftbackPower/(Math.abs(max));
+            rightfrPower = rightfrPower/(Math.abs(max));
+            rightbackPower = rightbackPower/(Math.abs(max));
 
 
-                telemetry.addData("Left Front;", leftfr.getPower());   //Check Power`
-                telemetry.addData("Right Front;", rightfr.getPower());
-                telemetry.addData("Left Back;", leftback.getPower());
-                telemetry.addData("Right Back;", rightback.getPower());
+
+            leftfr.setPower(leftfrPower);
+            leftback.setPower(leftbackPower);
+            rightfr.setPower(rightfrPower);
+            rightback.setPower(rightbackPower);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 //pickup mechanism
 
-            }
+
 
             //              leftPower = Range.clip(gather, -1.0, 1.0);
             //   rightPower = Range.clip(gather, -1.0, 1.0);

@@ -371,12 +371,7 @@ public class SensorBNO055IMU extends LinearOpMode
             telemetry.addData("Moved: ", moved);
             telemetry.addData("Degrees: ", Degrees);
             telemetry.addData("Velocity", imu.getVelocity());
-            if (moved <= Degrees) {
-                telemetry.addData("WHILE: ", true);
 
-            }else{
-                telemetry.addData("WHILE: ", false);
-            }
 
 
 
