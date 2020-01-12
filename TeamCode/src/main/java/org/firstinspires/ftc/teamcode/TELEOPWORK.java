@@ -51,6 +51,8 @@ public class TELEOPWORK extends LinearOpMode {
 
     double wheelPower =0;
 
+    boolean driveSrafe;
+
 
     double lastSlow = 0;
 
@@ -370,7 +372,14 @@ public class TELEOPWORK extends LinearOpMode {
             double max2;
             double max;
 
+
+            double min1;
+            double min2;
+            double min;
+
             double average;
+
+
 
             max1 = Math.max(Math.abs(leftfrPower), Math.abs(leftbackPower));
             max2 = Math.max(Math.abs(rightfrPower),Math.abs(rightbackPower));
@@ -384,6 +393,23 @@ public class TELEOPWORK extends LinearOpMode {
             leftbackPower = leftbackPower/(Math.abs(max));
             rightfrPower = rightfrPower/(Math.abs(max));
             rightbackPower = rightbackPower/(Math.abs(max));
+
+            if((gamepad1.right_stick_x >.1 &&gamepad1.right_stick_y <-.1))
+            {
+                driveSrafe = true;
+            }
+
+            if (driveSrafe == true)
+            {
+                leftfrPower = Range.clip(leftfrPower*((1+gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+                leftbackPower = Range.clip(leftbackPower*((1+gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+                rightfrPower = Range.clip(rightfrPower*((1-gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+                rightbackPower = Range.clip(rightbackPower*((1-gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+
+
+
+
+            }
 
 
 
