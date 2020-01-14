@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name= "TeleOp UPDATED", group= "Linear Opmode")
+@TeleOp(name= "TeleOp UPDATE", group= "Linear Opmode")
 
 public class TeleOpMode extends LinearOpMode {
 //@Disabled
