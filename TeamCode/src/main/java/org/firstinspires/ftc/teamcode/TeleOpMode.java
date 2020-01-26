@@ -28,6 +28,8 @@ public class TeleOpMode extends LinearOpMode {
     private CRServo rightWheels = null;
     private CRServo intakeArm = null;
 
+
+
     private DistanceSensor sensorRange;
 
     double leftfrPower;
@@ -38,9 +40,11 @@ public class TeleOpMode extends LinearOpMode {
     double leftPower;
     double rightPower;
     double intakeArmPower;
+    double intakeArmSlowPower;
 
 
     boolean capDown;
+    double time;
 
 
     double lastSlow = 0;
@@ -49,8 +53,12 @@ public class TeleOpMode extends LinearOpMode {
     boolean zeroBrake = true;
     double lastBrake = 0;
 
+    double lastAutoHook =0;
+
     private Servo leftHook;
     private Servo rightHook;
+
+    private Servo autoHook;
 
     boolean first = true;
     Servo newCap;
@@ -68,7 +76,7 @@ public class TeleOpMode extends LinearOpMode {
     boolean Tank = false;
 
     boolean slowMode = false;
-    int counter;
+    int counter=0;
     int currentPosition;
     int c=0;
 
@@ -95,6 +103,8 @@ public class TeleOpMode extends LinearOpMode {
         intakeArm = hardwareMap.get(CRServo.class, "intakeArm");   //Rack and Pinion Horizontal
 
 
+        autoHook = hardwareMap.get(Servo.class,"autoHook");
+
         rightHook.setDirection(Servo.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.FORWARD);
 
@@ -111,7 +121,7 @@ public class TeleOpMode extends LinearOpMode {
 
         intakeArm.setDirection(CRServo.Direction.FORWARD);
 
-
+        autoHook.setPosition(0);
         newCap.setPosition(0);
         ElapsedTime loopTimer = new ElapsedTime();
         ElapsedTime loopTimer2 = new ElapsedTime();
@@ -232,6 +242,19 @@ public class TeleOpMode extends LinearOpMode {
 
             }
 
+            if(counter==0 && gamepad2.left_trigger>0.2 && runtime.seconds()-lastAutoHook>0.5 )
+            {
+                counter=1;
+                autoHook.setPosition(1);
+                lastAutoHook=runtime.seconds();
+
+            }
+            if(counter==1 && gamepad2.left_trigger>0.2 && runtime.seconds()-lastAutoHook>0.5)
+             {
+                counter=0;
+                autoHook.setPosition(0);
+                lastAutoHook=runtime.seconds();
+             }
 
 
          if(gamepad2.b)
@@ -253,15 +276,6 @@ public class TeleOpMode extends LinearOpMode {
 
 
 
-           double gather = gamepad2.right_stick_y;
-
-            leftPower = Range.clip(gather, -1.0, 1.0);
-            rightPower = Range.clip(gather, -1.0, 1.0);
-
-            if (gather == 0) {
-                leftPower = 0;
-                rightPower = 0;
-            }
 
 
 
@@ -400,8 +414,8 @@ public class TeleOpMode extends LinearOpMode {
 */
 
 
-            double side = -gamepad2.left_stick_y;
-            double intakeArmSlowPower = -gamepad2.right_stick_y;
+             double side = -gamepad2.left_stick_y;
+             intakeArmSlowPower = -gamepad2.right_stick_y;
 
             if (side < -0.1)
             {
@@ -415,12 +429,12 @@ public class TeleOpMode extends LinearOpMode {
 
             if(intakeArmSlowPower<-0.1)
             {
-                intakeArmSlowPower=-0.5;
+                intakeArmSlowPower=-0.3;
 
             }
             if (intakeArmSlowPower>0.1)
             {
-                intakeArmSlowPower=0.5;
+                intakeArmSlowPower=0.3;
             }
 
             if((!(intakeArmSlowPower>0 || intakeArmSlowPower<0)) && (!(side>0 || side<0)))
@@ -498,8 +512,10 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("rhook", rhook);
             telemetry.addData("A: ", gamepad2.a);
             telemetry.addData("B:", gamepad2.b);
-            telemetry.addData("Left Power", leftWheels.getPower());
-            telemetry.addData("Right Power", rightWheels.getPower());
+            telemetry.addData("Left Power from Servo", leftWheels.getPower());
+            telemetry.addData("Right Power from Servo", rightWheels.getPower());
+            telemetry.addData("Port Number", rightWheels.getPortNumber());
+            telemetry.addData("Port Number", leftWheels.getPortNumber());
             telemetry.addData("Left Joystick Y: ", side);
             telemetry.addData("Intake Arm Power: ", intakeArm.getPower());
             telemetry.addData("Intake Arm : ", intakeArm.getPortNumber());
