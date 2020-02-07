@@ -31,7 +31,7 @@ public class TELEOPWORK extends LinearOpMode {
 
     private CRServo leftWheels = null;
     private CRServo rightWheels = null;
-    private CRServo rackPinionUD = null;
+   // private CRServo rackPinionUD = null;
     private CRServo rackPinionLR = null;
 
     private DistanceSensor sensorRange;
@@ -45,6 +45,9 @@ public class TELEOPWORK extends LinearOpMode {
     double rightPower;
     double rackPowerUD;
     double rackPowerLR;
+
+    private Servo NewCap = null;
+    private CRServo intakeArm = null;
 
 
     double cap;
@@ -92,15 +95,15 @@ public class TELEOPWORK extends LinearOpMode {
 
         leftWheels = hardwareMap.get(CRServo.class, "lw");   //leftwheels
         rightWheels = hardwareMap.get(CRServo.class, "rw");  //rightwheels
-        rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");  // Rack and Pinion Vertical
-        rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");   //Rack and Pinion Horizontal
+//        rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");  // Rack and Pinion Vertical
+       rackPinionLR = hardwareMap.get (CRServo.class, "intakeArm");   //Rack and Pinion Horizontal
         rightHook = hardwareMap.get(Servo.class,"rightHook");
         leftHook = hardwareMap.get(Servo.class,"leftHook");
 
         rightHook.setDirection(Servo.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.FORWARD);
 
-
+        NewCap = hardwareMap.get(Servo.class, "NewCap");
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -112,7 +115,7 @@ public class TELEOPWORK extends LinearOpMode {
 
         leftWheels.setDirection(CRServo.Direction.REVERSE);
         rightWheels.setDirection(CRServo.Direction.FORWARD);
-        rackPinionUD.setDirection(CRServo.Direction.FORWARD);
+//        rackPinionUD.setDirection(CRServo.Direction.FORWARD);
         rackPinionLR.setDirection(CRServo.Direction.FORWARD);
 
 
@@ -134,6 +137,7 @@ public class TELEOPWORK extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
+        NewCap.setPosition(0);
 
 
         // run until the end of the match (driver presses STOP)
@@ -248,7 +252,7 @@ public class TELEOPWORK extends LinearOpMode {
 
 
             }
-/*           if(gamepad2.x == true)
+           if(gamepad2.x == true)
            {
                if ((runtime.seconds()-lastTank) > .5)
                {
@@ -262,7 +266,7 @@ public class TELEOPWORK extends LinearOpMode {
                    }
                }
            }
-*/
+
             if (zeroBrake == true) {
                 leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //Makes motors brake when set to 0
                 leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -294,6 +298,12 @@ public class TELEOPWORK extends LinearOpMode {
             if(gamepad1.left_stick_x < .1 && gamepad1.left_stick_x > -.1)
             {
                 gamepad1.left_stick_x = 0;
+            }
+
+            if(Tank == true) {
+                NewCap.setPosition(0);
+            }else{
+                NewCap.setPosition(1);
             }
 
 
@@ -388,23 +398,40 @@ public class TELEOPWORK extends LinearOpMode {
 
             average =  Math.abs((gamepad1.left_stick_x + gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.right_stick_y)/ counter);
 
-            telemetry.addData("Average:", average);
-            leftfrPower = leftfrPower/(Math.abs(max));
-            leftbackPower = leftbackPower/(Math.abs(max));
-            rightfrPower = rightfrPower/(Math.abs(max));
-            rightbackPower = rightbackPower/(Math.abs(max));
+            min1 = Math.max(Math.abs(gamepad1.left_stick_x), Math.abs(gamepad1.left_stick_y));
+            min2 = Math.max(Math.abs(gamepad1.right_stick_x), Math.abs(gamepad1.right_stick_y));
+            min = Math.max(min1, min2);
 
-            if((gamepad1.right_stick_x >.1 &&gamepad1.right_stick_y <-.1))
+            telemetry.addData("Average:", average);
+            leftfrPower = leftfrPower/(Math.abs(max/min));
+            leftbackPower = leftbackPower/(Math.abs(max/min));
+            rightfrPower = rightfrPower/(Math.abs(max/min));
+            rightbackPower = rightbackPower/(Math.abs(max/min));
+            driveSrafe = false;
+            if((gamepad1.right_stick_y >.1 ||gamepad1.right_stick_y <-.1) && (gamepad1.left_stick_x > .1 || gamepad1.left_stick_x < -.1))
             {
+
                 driveSrafe = true;
             }
 
+            telemetry.addData("driveStrafe:", driveSrafe);
+
             if (driveSrafe == true)
             {
-                leftfrPower = Range.clip(leftfrPower*((1+gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+                leftfrPower = Range.clip(leftfrPower*((1+gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);   //One posible method
                 leftbackPower = Range.clip(leftbackPower*((1+gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
                 rightfrPower = Range.clip(rightfrPower*((1-gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
                 rightbackPower = Range.clip(rightbackPower*((1-gamepad1.left_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+//                if(gamepad1.right_stick_y >0)
+//                {
+//                    leftfrPower = Range.clip(leftfrPower*((1+gamepad1.right_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+//                    rightfrPower = Range.clip(rightfrPower*((1-gamepad1.right_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+//                }
+//                if(gamepad1.right_stick_y < 0)
+//                {
+//                    leftbackPower = Range.clip(leftbackPower*((1+gamepad1.right_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+//                    rightbackPower = Range.clip(rightbackPower*((1-gamepad1.right_stick_x)/1), Constants.MIN_POWER, Constants.MAX_POWER);
+//                }
 
 
 
@@ -549,7 +576,7 @@ public class TELEOPWORK extends LinearOpMode {
 
             //arm movement power
             rackPinionLR.setPower(rackPowerLR);
-            rackPinionUD.setPower(rackPowerUD);
+//            rackPinionUD.setPower(rackPowerUD);
 
 
 

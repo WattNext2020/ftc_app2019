@@ -33,7 +33,7 @@ import java.text.DecimalFormat;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
+import java.util.Arrays;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -41,6 +41,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -81,9 +82,15 @@ public class SensorBNO055IMU extends LinearOpMode
         private DcMotor rightfr = null;
         private DcMotor rightback = null;
 
+        double leftfrPower;
+        double leftbackPower;
+        double rightfrPower;
+        double rightbackPower;
+
 
 
         double initHeading;
+        double XY_Scale = 0;
 
 
 
@@ -130,6 +137,13 @@ public class SensorBNO055IMU extends LinearOpMode
         rightback = hardwareMap.get(DcMotor.class, "rightb");
 
 
+
+
+        rightfr.setDirection(DcMotor.Direction.REVERSE);
+        rightback.setDirection(DcMotor.Direction.REVERSE);
+
+
+
         // Set up our telemetry dashboard
         composeTelemetry();
 
@@ -143,13 +157,15 @@ public class SensorBNO055IMU extends LinearOpMode
         while (opModeIsActive()) {
 
 
+
+
+
+
 //            tmove(1, runtime.seconds(), -.4,0,0);
 //            tmove(2, runtime.seconds(), 0,0,0);
-            AcuMove(0,4);
+            //VIMove(0,100,.2);
 
-            AcuTurn(180, true);
-
-
+            straightMove(.5, 4.5);
 
 
 
@@ -168,6 +184,332 @@ public class SensorBNO055IMU extends LinearOpMode
 
 
         }
+    }
+    public void straightMove ( double speed,
+                              double time) // TI
+    {
+        telemetry.update();
+
+        leftfr.setPower(speed);
+        leftback.setPower(speed);
+        rightfr.setPower(speed);
+        rightback.setPower(speed);
+
+        double initHeading = angles.firstAngle;
+
+
+
+        runtime.reset();
+        while(runtime.seconds() < time)
+        {
+            double leftPower = speed, rightPower = speed;
+            telemetry.update();
+
+
+            if (Math.abs(angles.firstAngle - initHeading) > 1)
+            {
+
+                double adjust = -Range.scale(Range.clip(Math.abs(angles.firstAngle - initHeading), 0, 5.5),0, 20, 0,1 );
+                if((angles.firstAngle - initHeading) > 0)
+                {
+                    leftPower = leftPower + adjust;
+                    rightPower = rightPower - adjust;
+                }else
+                {
+                    leftPower = leftPower - adjust;
+                    rightPower = rightPower + adjust;
+                }
+                telemetry.addData("Adjusting", true);
+                telemetry.addData("Adjust:", adjust);
+            }
+
+
+
+
+            leftfr.setPower(Range.clip(leftPower, Constants.MIN_POWER, Constants.MAX_POWER));
+            leftback.setPower(Range.clip(leftPower, Constants.MIN_POWER, Constants.MAX_POWER));
+            rightfr.setPower(Range.clip(rightPower, Constants.MIN_POWER, Constants.MAX_POWER));
+            rightback.setPower(Range.clip(rightPower, Constants.MIN_POWER, Constants.MAX_POWER));
+
+
+
+        }
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
+
+        telemetry.addData("Change:",angles.firstAngle- initHeading );
+        telemetry.update();
+        sleep(1000);
+
+/*
+        leftfr.setTargetPosition((int)(leftfr.getCurrentPosition() + Math.round(leftInches*Constants.COUNTS_PER_INCH)));
+        leftback.setTargetPosition((int)(leftback.getCurrentPosition() + Math.round(leftInches*Constants.COUNTS_PER_INCH)));
+        rightfr.setTargetPosition((int)(rightfr.getCurrentPosition() + Math.round(rightInches*Constants.COUNTS_PER_INCH)));
+        rightback.setTargetPosition((int)(rightback.getCurrentPosition() + Math.round(rightInches*Constants.COUNTS_PER_INCH)));
+
+        leftfr.setPower(speed);
+        leftback.setPower(speed);
+        rightfr.setPower(speed);
+        rightback.setPower(speed);
+
+        leftfr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while(leftfr.isBusy() || leftback.isBusy() || rightfr.isBusy() || rightback.isBusy())
+        {
+            telemetry.addData("Running:", true);
+
+        }
+
+        leftfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
+*/
+
+    }
+
+
+        public void strafeMove ( double speed,
+                                   double time)
+        {
+            telemetry.update();
+
+            leftfr.setPower(speed);
+            leftback.setPower(speed);
+            rightfr.setPower(speed);
+            rightback.setPower(speed);
+
+            double initHeading = angles.firstAngle;
+
+
+
+            runtime.reset();
+            while(runtime.seconds() < time)
+            {
+                double leftDiag = speed, rightDiag = speed;
+                telemetry.update();
+
+
+                if (Math.abs(angles.firstAngle - initHeading) > 1)
+                {
+
+                    double adjust = -Range.scale(Range.clip(Math.abs(angles.firstAngle - initHeading), 0, 25),0, 25, 0,1 );
+                    if((angles.firstAngle - initHeading) > 0)
+                    {
+                        leftDiag = leftDiag + adjust;
+                        rightDiag = rightDiag - adjust;
+                    }else
+                    {
+                        leftDiag = leftDiag - adjust;
+                        rightDiag = rightDiag + adjust;
+                    }
+                    telemetry.addData("Adjusting", true);
+                    telemetry.addData("Adjust:", adjust);
+                }
+
+
+
+
+                leftfr.setPower(Range.clip(rightDiag, Constants.MIN_POWER, Constants.MAX_POWER));
+                leftback.setPower(Range.clip(-leftDiag, Constants.MIN_POWER, Constants.MAX_POWER));
+                rightfr.setPower(Range.clip(-leftDiag, Constants.MIN_POWER, Constants.MAX_POWER));
+                rightback.setPower(Range.clip(rightDiag, Constants.MIN_POWER, Constants.MAX_POWER));
+
+
+
+            }
+            leftfr.setPower(0);
+            leftback.setPower(0);
+            rightfr.setPower(0);
+            rightback.setPower(0);
+
+            telemetry.addData("Change:",angles.firstAngle- initHeading );
+            telemetry.update();
+            sleep(1000);
+
+/*
+        leftfr.setTargetPosition((int)(leftfr.getCurrentPosition() + Math.round(leftInches*Constants.COUNTS_PER_INCH)));
+        leftback.setTargetPosition((int)(leftback.getCurrentPosition() + Math.round(leftInches*Constants.COUNTS_PER_INCH)));
+        rightfr.setTargetPosition((int)(rightfr.getCurrentPosition() + Math.round(rightInches*Constants.COUNTS_PER_INCH)));
+        rightback.setTargetPosition((int)(rightback.getCurrentPosition() + Math.round(rightInches*Constants.COUNTS_PER_INCH)));
+
+        leftfr.setPower(speed);
+        leftback.setPower(speed);
+        rightfr.setPower(speed);
+        rightback.setPower(speed);
+
+        leftfr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while(leftfr.isBusy() || leftback.isBusy() || rightfr.isBusy() || rightback.isBusy())
+        {
+            telemetry.addData("Running:", true);
+
+        }
+
+        leftfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
+*/
+
+        }
+
+
+
+    public double getAcceleration(boolean x, boolean y)
+    {
+        int TimesRan = 0;
+
+
+
+        double [] temp = new double[3];
+        if(x == true)
+        {
+            while(TimesRan < 3)
+            {
+                temp[TimesRan] = gravity.xAccel * gravity.xAccel;
+                telemetry.update();
+            }
+        }
+        if(y == true)
+        {
+            while(TimesRan < 3)
+            {
+                temp[TimesRan] = gravity.yAccel * gravity.yAccel;
+                telemetry.update();
+            }
+        }
+        Arrays.sort(temp);
+
+        return temp[1];
+    }
+
+    void VIMove(double Angle , double Distance, double Power)
+    {
+        telemetry.update();
+        double Moved = 0;
+        double xAcceleration;
+        double yAcceleration;
+        double initYAccelration = getAcceleration(false,true);
+        double initXAccelration = getAcceleration(true,false);
+        double xMoved;
+        double yMoved;
+
+        double xLastSpeed = 0;
+        double yLastSpeed = 0;
+
+        double xSpeed;
+        double ySpeed;
+
+        double lastTime = 0; //seconds
+//        double lastXAcceleration;
+//        double lastYAcceleration;
+
+
+        while (Moved < Distance)
+        {
+            telemetry.update();
+
+            xAcceleration = getAcceleration(true,false) - initXAccelration;
+            yAcceleration = getAcceleration(false,true) - initYAccelration;
+
+            xSpeed = xLastSpeed +  xAcceleration/(runtime.seconds() - lastTime);
+            ySpeed = yLastSpeed +  yAcceleration/(runtime.seconds() - lastTime);
+
+            xMoved = xSpeed *(runtime.seconds() - lastTime);
+            yMoved = ySpeed *(runtime.seconds() - lastTime);
+
+            Moved = Math.pow(Math.pow(xMoved, 2) + Math.pow(yMoved, 2), .5);
+
+
+
+
+
+            telemetry.addData("Moved", Moved);
+            telemetry.addData("XMoved:", xMoved);
+            telemetry.addData("YMoved:", yMoved);
+            lastTime = runtime.seconds();
+        }
+    }
+    void vMove(double Angle, double Power)
+    {
+        double counter =0;
+
+
+        double Vx = 0;//-(Math.atan2(gamepad1.left_stick_x, gamepad1.left_stick_y)*180/Math.PI);
+        double Vy = Math.sin(Angle);
+
+        double Turn = Math.cos(Angle);
+
+        leftfrPower = Vy + Vx + Constants.WHEEL_DIST_H*Turn + Constants.WHEEL_DIST_V*Turn;
+        rightfrPower = Vy -Vx - Constants.WHEEL_DIST_H*Turn - Constants.WHEEL_DIST_V*Turn;
+        leftbackPower = Vy + Vx -Constants.WHEEL_DIST_H*Turn - Constants.WHEEL_DIST_V*Turn;
+        rightbackPower = Vy-Vx +Constants.WHEEL_DIST_H*Turn + Constants.WHEEL_DIST_V*Turn;
+
+
+
+
+
+
+
+
+        telemetry.addData("Counter:", counter);
+
+        double max1;
+        double max2;
+        double max;
+
+
+        double min1;
+        double min2;
+        double min;
+
+        double average;
+
+
+
+        max1 = Math.max(Math.abs(leftfrPower), Math.abs(leftbackPower));
+        max2 = Math.max(Math.abs(rightfrPower),Math.abs(rightbackPower));
+
+        max = Math.max(max1, max2);
+
+
+
+
+
+
+
+        leftfrPower = leftfrPower/(Math.abs(Power));
+        leftbackPower = leftbackPower/(Math.abs(Power));
+        rightfrPower = rightfrPower/(Math.abs(Power));
+        rightbackPower = rightbackPower/(Math.abs(Power));
+
+
+
+        leftfr.setPower(leftfrPower);
+        leftback.setPower(leftbackPower);
+        rightfr.setPower(rightfrPower);
+        rightback.setPower(rightbackPower);
+
+
     }
     void AcuMove(double StraifMeters, double TankMeters)
     {
@@ -244,7 +586,7 @@ public class SensorBNO055IMU extends LinearOpMode
 
 
 
-        
+
             telemetry.addData("Moved", movedTank/10000);
 
             telemetry.addData("Times Run:", runTimes);
@@ -382,36 +724,36 @@ public class SensorBNO055IMU extends LinearOpMode
                 {
                     leftfr.setPower(.4);
                     leftback.setPower(.4);
-                    rightfr.setPower(.4);
-                    rightback.setPower(.4);
+                    rightfr.setPower(-.4);
+                    rightback.setPower(-.4);
                 }else {
                     if((Degrees-moved) >40)
                     {
                         leftfr.setPower(.3);
                         leftback.setPower(.3);
-                        rightfr.setPower(.3);
-                        rightback.setPower(.3);
+                        rightfr.setPower(-.3);
+                        rightback.setPower(-.3);
                     }else{
                         if((Degrees-moved) >20)
                         {
                             leftfr.setPower(.2);
                             leftback.setPower(.2);
-                            rightfr.setPower(.2);
-                            rightback.setPower(.2);
+                            rightfr.setPower(-.2);
+                            rightback.setPower(-.2);
                         }
                         if((Degrees-moved) >10)
                         {
                             leftfr.setPower(.155);
                             leftback.setPower(.155);
-                            rightfr.setPower(.155);
-                            rightback.setPower(.155);
+                            rightfr.setPower(-.155);
+                            rightback.setPower(-.155);
                         }else{
                             if((Degrees-moved) >5)
                             {
                                 leftfr.setPower(.15);
                                 leftback.setPower(.15);
-                                rightfr.setPower(.15);
-                                rightback.setPower(.15);
+                                rightfr.setPower(-.15);
+                                rightback.setPower(-.15);
                             }
                         }
                     }
@@ -420,8 +762,8 @@ public class SensorBNO055IMU extends LinearOpMode
             }else{
                 leftfr.setPower(-.2);
                 leftback.setPower(-.2);
-                rightfr.setPower(-.2);
-                rightback.setPower(-.2);
+                rightfr.setPower(.2);
+                rightback.setPower(.2);
             }
 
 
