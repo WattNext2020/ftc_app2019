@@ -29,7 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.hardware.camera2.CameraDevice;
+import android.graphics.Camera;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -43,6 +43,7 @@ import java.util.*;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.vuforia.CameraDevice;
 
 import java.lang.Math;
 
@@ -389,20 +390,11 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
 
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
 
 
         telemetry.addData("Status", "Initialized");
@@ -431,7 +423,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         autoHook = hardwareMap.get(Servo.class,"autoHook");
 
         sensorDistance=hardwareMap.get(DistanceSensor.class,"sensorDistance");
-
+        CameraDevice.getInstance().setFlashTorchMode(true);
 
 
 
@@ -462,7 +454,6 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
         autoHook.setPosition(0);
          double initTime=0;
-
 
 
 
@@ -672,7 +663,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightfr.setPower(0.3);
         leftfr.setPower(0.3);
-        leftback.setPower(0.35);
+        leftback.setPower(0.45);
 
 
         while (rightback.isBusy()) {
@@ -681,7 +672,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 rightback.setPower(0.18);
                 rightfr.setPower(0.18);
                 leftfr.setPower(0.18);
-                leftback.setPower(0.18);
+                leftback.setPower(0.25);
 
 
                 if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 15)) {
@@ -901,161 +892,6 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
     }
 
-  public void AcuTurn(double Degrees, boolean Clockwise)
-
-    {
-        Degrees = (Math.abs(Degrees));
-        double moved =0;
-
-        double lastHead;
-
-
-        telemetry.update();
-        initHeading = angles.firstAngle;
-        lastHead = angles.firstAngle;
-
-
-        while(moved <= Degrees-3 && moved >= Degrees+3)
-        {
-            telemetry.addData("Test Data",Degrees- Math.abs(angles.firstAngle - initHeading)   );
-            telemetry.addData("Test Data 2", Math.abs(angles.firstAngle - initHeading)   );
-            telemetry.addData("Moved: ", moved);
-            telemetry.addData("Degrees: ", Degrees);
-            telemetry.addData("Velocity", imu.getVelocity());
-
-
-
-
-
-            if(Clockwise == true)
-            {
-                if((Degrees-moved) >70)
-                {
-                    leftfr.setPower(.4);
-                    leftback.setPower(.4);
-                    rightfr.setPower(.4);
-                    rightback.setPower(.4);
-                }else {
-                    if((Degrees-moved) >40)
-                    {
-                        leftfr.setPower(.3);
-                        leftback.setPower(.3);
-                        rightfr.setPower(.3);
-                        rightback.setPower(.3);
-                    }else{
-                        if((Degrees-moved) >20)
-                        {
-                            leftfr.setPower(.2);
-                            leftback.setPower(.2);
-                            rightfr.setPower(.2);
-                            rightback.setPower(.2);
-                        }
-                        if((Degrees-moved) >10)
-                        {
-                            leftfr.setPower(.155);
-                            leftback.setPower(.155);
-                            rightfr.setPower(.155);
-                            rightback.setPower(.155);
-                        }else{
-                            if((Degrees-moved) >5)
-                            {
-                                leftfr.setPower(.15);
-                                leftback.setPower(.15);
-                                rightfr.setPower(.15);
-                                rightback.setPower(.15);
-                            }
-                        }
-                    }
-                }
-
-            }else{
-                leftfr.setPower(-.2);
-                leftback.setPower(-.2);
-                rightfr.setPower(-.2);
-                rightback.setPower(-.2);
-            }
-
-
-            moved = moved + (Math.abs( angles.firstAngle - lastHead));
-            lastHead = angles.firstAngle;
-            telemetry.update();
-
-        }
-
-        leftfr.setPower(0);
-        leftback.setPower(0);
-        rightfr.setPower(0);
-        rightback.setPower(0);
-
-        return;
-
-    }
-
-    public void composeTelemetry() {
-
-        // At the beginning of each telemetry update, grab a bunch of data
-        // from the IMU that we will then display in separate lines.
-        telemetry.addAction(new Runnable() { @Override public void run()
-        {
-            // Acquiring the angles is relatively expensive; we don't want
-            // to do that in each of the three items that need that info, as that's
-            // three times the necessary expense.
-            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            gravity  = imu.getGravity();
-        }
-        });
-
-        telemetry.addLine()
-                .addData("status", new Func<String>() {
-                    @Override public String value() {
-                        return imu.getSystemStatus().toShortString();
-                    }
-                })
-                .addData("calib", new Func<String>() {
-                    @Override public String value() {
-                        return imu.getCalibrationStatus().toString();
-                    }
-                });
-
-        telemetry.addLine()
-                .addData("heading", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.firstAngle);
-                    }
-                })
-                .addData("roll", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.secondAngle);
-                    }
-                })
-                .addData("pitch", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.thirdAngle);
-                    }
-                });
-
-        telemetry.addLine()
-                .addData("grvty", new Func<String>() {
-                    @Override public String value() {
-                        return gravity.toString();
-                    }
-                })
-                .addData("mag", new Func<String>() {
-                    @Override public String value() {
-                        return String.format(Locale.getDefault(), "%.3f",
-                                Math.sqrt(gravity.xAccel*gravity.xAccel
-                                        + gravity.yAccel*gravity.yAccel
-                                        + gravity.zAccel*gravity.zAccel));
-                    }
-                });
-    }
-    String formatAngle(AngleUnit angleUnit, double angle) {
-        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
-    }
-
-    String formatDegrees(double degrees){
-        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
-    }
 
 
 
