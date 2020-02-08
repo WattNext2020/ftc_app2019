@@ -29,43 +29,63 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.hardware.camera2.CameraDevice;
+import android.graphics.Camera;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.*;
 
+import com.vuforia.CameraDevice;
+
+import java.lang.*;
+import java.text.DecimalFormat;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
 
 import java.lang.Math;
 
 
-import org.firstinspires.ftc.robotcontroller.external.samples.SensorREVColorDistance;
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-import java.lang.*;
 import java.util.Locale;
-import java.text.DecimalFormat;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Locale;
+
+
+import java.lang.Math;
+
+
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+
+import java.lang.*;
+
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -121,6 +141,23 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 @Autonomous(name="SKYSTONE Vuforia Position UPDATE", group ="Concept")
 public class VuforiaSkystonePosition extends LinearOpMode {
 
+    // State used for updating telemetry
+    Orientation angles;
+    Acceleration gravity;
+
+
+    //----------------------------------------------------------------------------------------------
+    // State
+    //----------------------------------------------------------------------------------------------
+
+    // The IMU sensor object
+    BNO055IMU imu;
+
+    // State used for updating telemetry
+
+    double initHeading;
+
+
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
     // 2) Phone Orientation. Choices are: PHONE_IS_PORTRAIT = true (portrait) or PHONE_IS_PORTRAIT = false (landscape)
@@ -146,10 +183,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
     public DistanceSensor sensorDistance;
 
-    private  Servo autoHook;
-
-    BNO055IMU imu;
-
+    private Servo autoHook;
 
 
     double leftfrPower;
@@ -163,12 +197,13 @@ public class VuforiaSkystonePosition extends LinearOpMode {
     double rackPowerLR;
     int location = 0;
     int MOTOR_TICKS = 850;
+    int DELIVERY = 2000;
+
     int STRAFE_TICKS = 400;
-    int TOSKYSTONE=475;
+    int TOSKYSTONE = 475;
 
     boolean first = true;
 
-    double initHeading;
     double newInitTime;
 
 
@@ -215,9 +250,6 @@ public class VuforiaSkystonePosition extends LinearOpMode {
     private float phoneYRotate = 0;
     private float phoneZRotate = 0;
 
-    public Orientation angles;
-    public Acceleration gravity;
-
 
     @Override
     public void runOpMode() {
@@ -226,6 +258,27 @@ public class VuforiaSkystonePosition extends LinearOpMode {
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
          * If no camera monitor is desired, use the parameter-less constructor instead (commented out below).
          */
+
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        composeTelemetry();
+
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parametersV = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         // VuforiaLocalizer.Parameters parametersV = new VuforiaLocalizer.Parameters();
@@ -388,28 +441,13 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         }
 
 
-
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
 
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
-
-
 
 
         // Initialize the hardware variables. Note that the strings used here as parametersV
@@ -428,11 +466,10 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         leftHook = hardwareMap.get(Servo.class, "leftHook");
         rightHook = hardwareMap.get(Servo.class, "rightHook");
 
-        autoHook = hardwareMap.get(Servo.class,"autoHook");
+        autoHook = hardwareMap.get(Servo.class, "autoHook");
 
-        sensorDistance=hardwareMap.get(DistanceSensor.class,"sensorDistance");
-
-
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensorDistance");
+        CameraDevice.getInstance().setFlashTorchMode(true);
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -461,24 +498,18 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         leftWheels.setPower(0);
 
         autoHook.setPosition(0);
-         double initTime=0;
-
-
-
-
-
+        double initTime = 0;
 
 
         ElapsedTime InitTimer = new ElapsedTime();
 
         InitTimer.reset();
         InitTimer.startTime();
-        while(InitTimer.seconds()<45 && !isStopRequested() && !opModeIsActive())
-        {
-            telemetry.addData("Time In Seconds:",InitTimer.seconds());
+        while (InitTimer.seconds() < 45 && !isStopRequested() && !opModeIsActive()) {
+            telemetry.addData("Time In Seconds:", InitTimer.seconds());
             telemetry.update();
         }
-        telemetry.addData("Ready to Start!"," ");
+        telemetry.addData("Ready to Start!", " ");
         telemetry.update();
         InitTimer.reset();
 
@@ -496,7 +527,6 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         // Tap the preview window to receive a fresh image.
 
         while (opModeIsActive() && !isStopRequested()) {
-//            AcuTurn(90,false);
             EncoderMove(rightback, rightfr, leftfr, leftback);
             ElapsedTime LoopTimer = new ElapsedTime();
             LoopTimer.reset();
@@ -509,7 +539,10 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                             skystoneVisible = true;
                             location = 1;
                             MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback);
-                            sleep(2000);
+                            AcuTurn(-90, true);
+                            DeliverySkystone(rightback, rightfr, leftfr, leftback);
+                            Parking(rightback, rightfr, leftfr, leftback);
+                            stop();
                             break;
                         }
                     }
@@ -580,6 +613,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
         }
 
+//up till here
 
 
 
@@ -658,12 +692,74 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                  */
 
 
-
     // }
     // }
+    public void Parking (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback)
+    {
+
+        telemetry.addData("Parking", " ");
+        telemetry.update();
+        rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightback.setTargetPosition(rightback.getCurrentPosition() - 1000);
+        rightback.setPower(0.50);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setPower(-0.50);
+        leftfr.setPower(-0.50);
+        leftback.setPower(-0.65);
+        while (rightback.isBusy()) {
+            if (rightback.getCurrentPosition() <= (rightback.getTargetPosition() + 15)) {
+                leftback.setPower(0);
+                rightback.setPower(0);
+                rightfr.setPower(0);
+                leftfr.setPower(0);
+                leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                return;
+            }
+        }
 
 
-    public void EncoderMove(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback) {
+
+
+    }
+    public void DeliverySkystone (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor
+        leftback)
+{
+
+    rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY);
+    rightback.setPower(0.80);
+    rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    rightfr.setPower(0.80);
+    leftfr.setPower(0.80);
+    leftback.setPower(0.9);
+    while (rightback.isBusy()) {
+
+        if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 15)) {
+            leftback.setPower(0);
+            rightback.setPower(0);
+            rightfr.setPower(0);
+            leftfr.setPower(0);
+            leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            autoHook.setPosition(0.1);
+            telemetry.addData("Delivered", " ");
+            telemetry.update();
+            return;
+
+        }
+    }
+
+}
+    public void EncoderMove(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor
+            leftback) {
 
         rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -672,7 +768,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightfr.setPower(0.3);
         leftfr.setPower(0.3);
-        leftback.setPower(0.35);
+        leftback.setPower(0.45);
 
 
         while (rightback.isBusy()) {
@@ -681,7 +777,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 rightback.setPower(0.18);
                 rightfr.setPower(0.18);
                 leftfr.setPower(0.18);
-                leftback.setPower(0.18);
+                leftback.setPower(0.25);
 
 
                 if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 15)) {
@@ -745,8 +841,8 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 //        }
                 autoHook.setPosition(1);
                 rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                sleep(1000);
-                rightback.setTargetPosition(-TOSKYSTONE);
+                sleep(2000);
+                rightback.setTargetPosition(-TOSKYSTONE+100);
                 rightback.setPower(0.2);
                 rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 rightfr.setPower(-0.2);
@@ -819,37 +915,30 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 //                    }
 
 
-
-            }
-
+    }
 
 
+    public void EncoderStrafe(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor
+            leftback, double initTime) {
+
+        initTime = runtime.seconds();
+        rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        while ((runtime.seconds() - initTime) < 1.7) {
+            rightback.setPower(-0.4);
+            rightfr.setPower(0.4);
+            leftfr.setPower(-0.4);
+            leftback.setPower(0.55);
+            telemetry.addData("Strafing", " ");
+            telemetry.update();
+        }
+        rightback.setPower(0);
+        rightfr.setPower(0);
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        return;
 
 
-
-
-
-            public void EncoderStrafe (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback,double initTime)
-        {
-
-                initTime = runtime.seconds();
-                rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                while ((runtime.seconds() - initTime) < 1.7) {
-                    rightback.setPower(-0.3);
-                    rightfr.setPower(0.3);
-                    leftfr.setPower(-0.3);
-                    leftback.setPower(0.45);
-                    telemetry.addData("Strafing", " ");
-                    telemetry.update();
-                }
-                rightback.setPower(0);
-                rightfr.setPower(0);
-                leftfr.setPower(0);
-                leftback.setPower(0);
-                return;
-
-
-            }
+    }
 
 
 
@@ -884,8 +973,6 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         */
 
 
-
-
     public void targetTelemetry(boolean targetVisible) {
         if (targetVisible) {
             telemetry.addData("Skystone Identified:", "True");
@@ -901,74 +988,81 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
     }
 
-  public void AcuTurn(double Degrees, boolean Clockwise)
 
-    {
+
+
+
+    public static void roundAndPrint(double n, int round2DecimalPlace) {
+        String temp;
+        BigDecimal instance = new BigDecimal(Double.toString(n));
+        instance = instance.setScale(round2DecimalPlace, RoundingMode.HALF_UP);
+
+    }
+
+
+   public void AcuTurn(double Degrees, boolean Clockwise) {
         Degrees = (Math.abs(Degrees));
-        double moved =0;
+        double moved = 0;
 
         double lastHead;
 
 
+       telemetry.addData("Test Uday", true);
         telemetry.update();
         initHeading = angles.firstAngle;
         lastHead = angles.firstAngle;
+        telemetry.addData("TestSTATEMENT:",moved != Degrees );
+telemetry.addData("Heading: ",angles.firstAngle);
 
+        while (moved <Degrees) {
+            rightback.setDirection(DcMotor.Direction.REVERSE);
+            rightfr.setDirection(DcMotor.Direction.REVERSE);
+            leftfr.setDirection(DcMotor.Direction.REVERSE);
+            leftback.setDirection(DcMotor.Direction.REVERSE);
 
-        while(moved <= Degrees-3 && moved >= Degrees+3)
-        {
-            telemetry.addData("Test Data",Degrees- Math.abs(angles.firstAngle - initHeading)   );
-            telemetry.addData("Test Data 2", Math.abs(angles.firstAngle - initHeading)   );
+            telemetry.addData("Test Data", Degrees - Math.abs(angles.firstAngle - initHeading));
+            telemetry.addData("Test Data 2", Math.abs(angles.firstAngle - initHeading));
             telemetry.addData("Moved: ", moved);
             telemetry.addData("Degrees: ", Degrees);
             telemetry.addData("Velocity", imu.getVelocity());
 
 
-
-
-
-            if(Clockwise == true)
-            {
-                if((Degrees-moved) >70)
-                {
+            if (Clockwise == true) {
+                if ((Degrees - moved) > 70) {
                     leftfr.setPower(.4);
                     leftback.setPower(.4);
                     rightfr.setPower(.4);
                     rightback.setPower(.4);
-                }else {
-                    if((Degrees-moved) >40)
-                    {
+                } else {
+                    if ((Degrees - moved) > 40) {
                         leftfr.setPower(.3);
                         leftback.setPower(.3);
                         rightfr.setPower(.3);
                         rightback.setPower(.3);
-                    }else{
-                        if((Degrees-moved) >20)
-                        {
+                    } else {
+                        if ((Degrees - moved) > 10) {
                             leftfr.setPower(.2);
                             leftback.setPower(.2);
                             rightfr.setPower(.2);
                             rightback.setPower(.2);
                         }
-                        if((Degrees-moved) >10)
-                        {
-                            leftfr.setPower(.155);
-                            leftback.setPower(.155);
-                            rightfr.setPower(.155);
-                            rightback.setPower(.155);
-                        }else{
-                            if((Degrees-moved) >5)
-                            {
-                                leftfr.setPower(.15);
-                                leftback.setPower(.15);
-                                rightfr.setPower(.15);
-                                rightback.setPower(.15);
+                        if ((Degrees - moved) > 10) {
+                            leftfr.setPower(.2);
+                            leftback.setPower(.2);
+                            rightfr.setPower(.2);
+                            rightback.setPower(.2);
+                        } else {
+                            if ((Degrees - moved) > 5) {
+                                leftfr.setPower(.16);
+                                leftback.setPower(.16);
+                                rightfr.setPower(.16);
+                                rightback.setPower(.16);
                             }
                         }
                     }
                 }
 
-            }else{
+            } else {
                 leftfr.setPower(-.2);
                 leftback.setPower(-.2);
                 rightfr.setPower(-.2);
@@ -976,91 +1070,111 @@ public class VuforiaSkystonePosition extends LinearOpMode {
             }
 
 
-            moved = moved + (Math.abs( angles.firstAngle - lastHead));
+            moved = moved + (Math.abs(angles.firstAngle - lastHead));
             lastHead = angles.firstAngle;
             telemetry.update();
 
         }
-
+telemetry.addData("Setting Power to 0",true);
+        telemetry.update();
         leftfr.setPower(0);
         leftback.setPower(0);
         rightfr.setPower(0);
         rightback.setPower(0);
+       leftfr.setDirection(DcMotor.Direction.FORWARD);
+       leftback.setDirection(DcMotor.Direction.FORWARD);
+       rightfr.setDirection(DcMotor.Direction.REVERSE);
+       rightback.setDirection(DcMotor.Direction.REVERSE);
+
 
         return;
 
     }
 
-    public void composeTelemetry() {
+    //----------------------------------------------------------------------------------------------
+    // Telemetry Configuration
+    //----------------------------------------------------------------------------------------------
+
+    void composeTelemetry() {
 
         // At the beginning of each telemetry update, grab a bunch of data
         // from the IMU that we will then display in separate lines.
-        telemetry.addAction(new Runnable() { @Override public void run()
-        {
-            // Acquiring the angles is relatively expensive; we don't want
-            // to do that in each of the three items that need that info, as that's
-            // three times the necessary expense.
-            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            gravity  = imu.getGravity();
-        }
+        telemetry.addAction(new Runnable() {
+            @Override
+            public void run() {
+                // Acquiring the angles is relatively expensive; we don't want
+                // to do that in each of the three items that need that info, as that's
+                // three times the necessary expense.
+                angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+                gravity = imu.getGravity();
+            }
         });
 
         telemetry.addLine()
                 .addData("status", new Func<String>() {
-                    @Override public String value() {
+                    @Override
+                    public String value() {
                         return imu.getSystemStatus().toShortString();
                     }
                 })
                 .addData("calib", new Func<String>() {
-                    @Override public String value() {
+                    @Override
+                    public String value() {
                         return imu.getCalibrationStatus().toString();
                     }
                 });
 
         telemetry.addLine()
                 .addData("heading", new Func<String>() {
-                    @Override public String value() {
+                    @Override
+                    public String value() {
                         return formatAngle(angles.angleUnit, angles.firstAngle);
                     }
                 })
                 .addData("roll", new Func<String>() {
-                    @Override public String value() {
+                    @Override
+                    public String value() {
                         return formatAngle(angles.angleUnit, angles.secondAngle);
                     }
                 })
                 .addData("pitch", new Func<String>() {
-                    @Override public String value() {
+                    @Override
+                    public String value() {
                         return formatAngle(angles.angleUnit, angles.thirdAngle);
                     }
                 });
 
         telemetry.addLine()
                 .addData("grvty", new Func<String>() {
-                    @Override public String value() {
+                    @Override
+                    public String value() {
                         return gravity.toString();
                     }
                 })
                 .addData("mag", new Func<String>() {
-                    @Override public String value() {
+                    @Override
+                    public String value() {
                         return String.format(Locale.getDefault(), "%.3f",
-                                Math.sqrt(gravity.xAccel*gravity.xAccel
-                                        + gravity.yAccel*gravity.yAccel
-                                        + gravity.zAccel*gravity.zAccel));
+                                Math.sqrt(gravity.xAccel * gravity.xAccel
+                                        + gravity.yAccel * gravity.yAccel
+                                        + gravity.zAccel * gravity.zAccel));
                     }
                 });
     }
+
+    //----------------------------------------------------------------------------------------------
+    // Formatting
+    //----------------------------------------------------------------------------------------------
+
     String formatAngle(AngleUnit angleUnit, double angle) {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
     }
 
-    String formatDegrees(double degrees){
+    String formatDegrees(double degrees) {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 
 
-
-
-}
     // check all the trackable targets to see which one (if any) is visible.
 
 
@@ -1098,7 +1212,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         }
 */
 
-
+}
 
 
 
