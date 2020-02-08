@@ -128,7 +128,7 @@ public class TeleOpMode extends LinearOpMode {
 
         intakeArm.setDirection(DcMotor.Direction.FORWARD);
 
-        autoHook.setPosition(0.5);
+        autoHook.setPosition(0);
         newCap.setPosition(0);
 
         ElapsedTime loopTimer = new ElapsedTime();
@@ -249,17 +249,17 @@ public class TeleOpMode extends LinearOpMode {
                 newCap.setPosition(0);
             }
 
-            if(counter==0 && gamepad2.left_trigger>0.3 && runtime.seconds()-lastAutoHook>0.75)
+            if(counter==0 && gamepad2.left_trigger>0.5 && runtime.seconds()-lastAutoHook>0.75)
             {
                 counter=1;
                 autoHook.setPosition(1);
                 lastAutoHook=runtime.seconds();
 
             }
-            if(counter==1 && gamepad2.left_trigger>0.3 && runtime.seconds()-lastAutoHook>0.75)
+            if(counter==1 && gamepad2.left_trigger>0.5 && runtime.seconds()-lastAutoHook>0.75)
             {
                 counter=0;
-                autoHook.setPosition(0.5);
+                autoHook.setPosition(0);
                 lastAutoHook=runtime.seconds();
             }
 
