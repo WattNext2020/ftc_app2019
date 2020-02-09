@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -25,6 +26,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="ColorSensor", group="Linear Opmode")
+@Disabled
 public class ColorSensor extends LinearOpMode {
     DcMotor leftfr, leftback, rightfr, rightback;
     Servo leftHook, rightHook;
@@ -46,6 +48,8 @@ public class ColorSensor extends LinearOpMode {
         //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
         //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
 
+
+        MRcs1 = hardwareMap.get(ModernRoboticsI2cColorSensor.class,"MRcs1");
         leftHook = hardwareMap.get(Servo.class, "leftHook");
         rightHook = hardwareMap.get(Servo.class, "rightHook");
 
@@ -74,12 +78,19 @@ public class ColorSensor extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive()) {
 
-            while(!(MRcs1.red()>0)) {
+            while(!(MRcs1.red()>0))
+            {
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
             }
+            leftfr.setPower(0);
+            leftback.setPower(0);
+            rightfr.setPower(0);
+            rightback.setPower(0);
+            stop();
+
 
                    telemetry.addData("Red:",MRcs1.red());
                   telemetry.addData("Green:",MRcs1.green());
