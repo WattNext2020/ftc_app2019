@@ -1,24 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-
-
-
-@TeleOp(name= "TeleOp", group= "Linear Opmode")
+@TeleOp(name= "TeleOp UPDATE", group= "Linear Opmode")
 
 public class TeleOpMode extends LinearOpMode {
 //@Disabled
@@ -33,8 +26,14 @@ public class TeleOpMode extends LinearOpMode {
 
     private CRServo leftWheels = null;
     private CRServo rightWheels = null;
-    private CRServo rackPinionUD = null;
-    private CRServo rackPinionLR = null;
+    private DcMotor intakeArm = null;
+    double lastEncoderHold;
+    int intakeArmCurrentPosition;
+    boolean needsToRun =false;
+
+
+
+
 
     private DistanceSensor sensorRange;
 
@@ -45,34 +44,49 @@ public class TeleOpMode extends LinearOpMode {
 
     double leftPower;
     double rightPower;
-    double rackPowerUD;
-    double rackPowerLR;
+    double intakeArmPower;
+    double intakeArmSlowPower;
 
 
-    double cap;
+    boolean capDown;
+    double time;
 
 
     double lastSlow = 0;
+    double lastCap = 0;
 
     boolean zeroBrake = true;
     double lastBrake = 0;
 
+    double lastAutoHook =0;
+
     private Servo leftHook;
     private Servo rightHook;
 
-    boolean first = true;
+    private Servo autoHook;
+    double side;
 
+    boolean first = true;
+    Servo newCap;
+
+    //CRServo capStone;
 
     boolean rhook;
     boolean lhook;
+    int initialEncoder;
 
-    double lastrhook =0;
+    double lastrhook = 0;
     double lastlhook = 0;
+
 
     double lastTank = 0;
     boolean Tank = false;
 
     boolean slowMode = false;
+    int counter=0;
+    int currentPosition;
+    int c=0;
+
 
     @Override
     public void runOpMode() {
@@ -89,15 +103,17 @@ public class TeleOpMode extends LinearOpMode {
 
         leftWheels = hardwareMap.get(CRServo.class, "lw");   //leftwheels
         rightWheels = hardwareMap.get(CRServo.class, "rw");  //rightwheels
-        rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");  // Rack and Pinion Vertical
-        rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");   //Rack and Pinion Horizontal
-        rightHook = hardwareMap.get(Servo.class,"rightHook");
-        leftHook = hardwareMap.get(Servo.class,"leftHook");
+        //   capStone = hardwareMap.get(CRServo.class, "Cap");  // Rack and Pinion Vertical
+        rightHook = hardwareMap.get(Servo.class, "rightHook");
+        leftHook = hardwareMap.get(Servo.class, "leftHook");
+        newCap = hardwareMap.get(Servo.class, "NewCap");
+        intakeArm = hardwareMap.get(DcMotor.class, "intakeArm");   //Rack and Pinion Horizontal
+
+
+        autoHook = hardwareMap.get(Servo.class,"autoHook");
 
         rightHook.setDirection(Servo.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.FORWARD);
-
-
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -109,9 +125,16 @@ public class TeleOpMode extends LinearOpMode {
 
         leftWheels.setDirection(CRServo.Direction.REVERSE);
         rightWheels.setDirection(CRServo.Direction.FORWARD);
-        rackPinionUD.setDirection(CRServo.Direction.FORWARD);
-        rackPinionLR.setDirection(CRServo.Direction.FORWARD);
 
+        intakeArm.setDirection(DcMotor.Direction.FORWARD);
+
+        autoHook.setPosition(0);
+        newCap.setPosition(0);
+
+        ElapsedTime loopTimer = new ElapsedTime();
+        ElapsedTime loopTimer2 = new ElapsedTime();
+        rightWheels.setPower(0);
+        leftWheels.setPower(0);
 
 
 
@@ -141,18 +164,19 @@ public class TeleOpMode extends LinearOpMode {
             double tankPower = gamepad1.right_stick_y;
             double turnPower = gamepad1.left_stick_x;
 
-            if(first ==true)
-            {
+            if (first == true) {
                 rightHook.setPosition(0);
                 leftHook.setPosition(0);
                 slowMode = false;
             }
 
+
             first = false;
 
             // Zero Brake Code
             if (gamepad1.b == true) {
-                if ((runtime.seconds() - lastBrake) > .5) { //slow mode threshold
+                if ((runtime.seconds() - lastBrake) > .5)
+                { //slow mode threshold
 
                     if (zeroBrake == true) {
                         zeroBrake = false;
@@ -164,9 +188,7 @@ public class TeleOpMode extends LinearOpMode {
 
                 }
 
-
             }
-
 
             if (gamepad2.right_bumper == true || gamepad1.right_bumper == true) {
                 if ((runtime.seconds() - lastrhook) > .5) { //slow mode threshold
@@ -178,9 +200,7 @@ public class TeleOpMode extends LinearOpMode {
                         rhook = true;
                         lastrhook = runtime.seconds();
                     }
-
                 }
-
 
             }
 
@@ -201,11 +221,6 @@ public class TeleOpMode extends LinearOpMode {
             }
 
 
-
-
-
-
-
             //Slowmode Code
 
             if (gamepad1.a == true) {
@@ -222,28 +237,150 @@ public class TeleOpMode extends LinearOpMode {
                     }
 
                 }
-
-                //zero brake
-
+            }
 
 
+
+            //zero brake
+            if (gamepad2.x) {
+                newCap.setPosition(1);
+            }
+            if (gamepad2.y) {
+                newCap.setPosition(0);
+            }
+
+            if(counter==0 && gamepad2.left_trigger>0.5 && runtime.seconds()-lastAutoHook>0.75)
+            {
+                counter=1;
+                autoHook.setPosition(1);
+                lastAutoHook=runtime.seconds();
 
             }
-            if(gamepad2.x == true)
+            if(counter==1 && gamepad2.left_trigger>0.5 && runtime.seconds()-lastAutoHook>0.75)
+            {
+                counter=0;
+                autoHook.setPosition(0);
+                lastAutoHook=runtime.seconds();
+            }
+
+
+            if(gamepad2.b)
+            {
+                leftPower=0.75;
+                rightPower=0.75;
+            }
+            if(gamepad2.a) {
+                leftPower = -0.75;
+                rightPower = -0.75;
+            }
+            if(!gamepad2.a&&!gamepad2.b)
+            {
+                leftPower=0;
+                rightPower=0;
+            }
+
+             side = -gamepad2.left_stick_y;
+            intakeArmSlowPower = -gamepad2.right_stick_y;
+
+            if (side < -0.1)
+            {
+                intakeArmPower=1;
+            }
+            else if (side > 0.1)
+            {
+                intakeArmPower=-1;
+            }
+
+            if(intakeArmSlowPower<-0.1)
+            {
+                intakeArmSlowPower=-0.5;
+
+            }
+            if (intakeArmSlowPower>0.1)
+            {
+                intakeArmSlowPower=0.5;
+            }
+
+
+            if((!(intakeArmSlowPower>0 || intakeArmSlowPower<0)) && (!(side>0 || side<0)))
+            {
+                intakeArmSlowPower=0;
+                intakeArmPower=0;
+            }
+
+
+//            if (gamepad2.right_trigger > 0.3 && runtime.seconds() - lastEncoderHold > 1 )
+//            {
+//                if(c==1)
+//                {
+//                    c=0;
+//                }
+//                else if(c==0)
+//                {
+//                    c=1;
+//                    initialEncoder=intakeArm.getCurrentPosition();
+//                }
+//                lastEncoderHold=runtime.seconds();
+//            }
+//
+//            if(c==1)
+//            {
+//                intakeArmSlowPower=0;
+//                intakeArmPower=0;
+//                intakeArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//                intakeArm.setTargetPosition(initialEncoder);
+//                if(intakeArm.getCurrentPosition()-5<=initialEncoder || intakeArm.getCurrentPosition()+5>=initialEncoder)
+//                {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*    if (gamepad2.x== true) {
+                    if ((runtime.seconds() - lastCap) > .5) { //slow mode threshold
+
+                        if (down == true) {
+
+                            down = false;
+                            lastCap = runtime.seconds();
+                        } else {
+
+                            down = true;
+                            lastCap = runtime.seconds();
+                        }
+
+             */
+
+
+
+
+
+        /*   if(gamepad2.x == true)
             {
                 if ((runtime.seconds()-lastTank) > .5)
                 {
                     if(Tank == false)
                     {
-                        Tank = true;
+                        cap = true;
                     }
                     else
                     {
-                        Tank = false;
+                        cap = false;
                     }
                 }
             }
-
+*/
             if (zeroBrake == true) {
                 leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //Makes motors brake when set to 0
                 leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -262,26 +399,27 @@ public class TeleOpMode extends LinearOpMode {
                 tankPower = tankPower * .5;
                 turnPower = turnPower * .5;
             }
-            if(lhook ==true)
-            {
+            if (lhook == true) {
                 leftHook.setPosition(1);
 
-            }
-            else
-            {
+            } else {
                 leftHook.setPosition(0);
             }
 
-            if(rhook == true){
+            if (rhook == true) {
                 rightHook.setPosition(1);
-            }
-            else
-            {
+            } else {
                 rightHook.setPosition(0);
             }
 
 
 
+     /*      if (gamepad2.x == true)
+            {
+                capStone.setPower(1);
+            }
+
+      */
 
 
             if (turnPower < -0.1) {
@@ -289,31 +427,23 @@ public class TeleOpMode extends LinearOpMode {
                 leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
                 rightfrPower = Range.clip(turnPower, -1.0, 1.0);
                 rightbackPower = Range.clip(turnPower, -1.0, 1.0);
-            }
-
-            else if (turnPower > 0.1) {
+            } else if (turnPower > 0.1) {
                 leftfrPower = Range.clip(-turnPower, -1.0, 1.0);
                 leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
                 rightfrPower = Range.clip(turnPower, -1.0, 1.0);
                 rightbackPower = Range.clip(turnPower, -1.0, 1.0);
 
-            }
-
-
-            else if (straifPower < -0.1) {
+            } else if (straifPower < -0.1) {
                 leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
                 leftbackPower = Range.clip(straifPower, -1.0, 1.0);
                 rightfrPower = Range.clip(straifPower, -1.0, 1.0);
                 rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
-            }
-            else if (straifPower > 0.1) {
+            } else if (straifPower > 0.1) {
                 leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
                 leftbackPower = Range.clip(straifPower, -1.0, 1.0);
                 rightfrPower = Range.clip(straifPower, -1.0, 1.0);
                 rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
-            }
-
-            else if (tankPower < -0.1) {
+            } else if (tankPower < -0.1) {
                 leftbackPower = Range.clip(tankPower, -1.0, 1.0);
                 rightbackPower = Range.clip(tankPower, -1.0, 1.0);
                 leftfrPower = Range.clip(tankPower, -1.0, 1.0);
@@ -333,75 +463,69 @@ public class TeleOpMode extends LinearOpMode {
             }
 
             //pickup mechanism
-            double gather = gamepad2.right_stick_y;
 
-            leftPower = Range.clip(gather, -1.0, 1.0);
-            rightPower = Range.clip(gather, -1.0, 1.0);
 
-            cap = 0;
-            if(gamepad2.a == true)
+            //    capStone.setPower(0);
+
+       /*     if(gamepad2.a == true)
             {
-                cap = -1;
+                capStone.setPower(1);
             }
 
 
             if(gamepad2.b == true)
             {
-                cap = 1;
+                capStone.setPower(-1);
             }
+*/
 
-            if(Tank == true)
+
+
+
+
+
+
+      /*      if (gamepad2.a)   //braki
+      /*      if (gamepad2.a)   //braking of intakeArm
             {
-                leftfr.setPower(gamepad2.left_stick_y *.6);
-                leftback.setPower(gamepad2.left_stick_y *.6);
-                rightfr.setPower(gamepad2.right_stick_y *.6);
-                rightback.setPower(gamepad2.right_trigger *.6);
+                if(counter==1)  //braking on
+                {
+                    intakeArm.set
 
-                telemetry.addData("Tank", "True");
+                }
+
+
+                if(counter==2) //braking off
+                {
+
+                 counter=1; //
+
+                }
 
             }
+            */
 
+       /*    if (leftPower>0&&rightPower>0) {
+                loopTimer2.startTime();
+                while (loopTimer2.seconds() <= 1) {
+                    telemetry.addData("Only Running Outake"," ");
+                    telemetry.update();
+                    intakeArmPower=0;
+                }
+                loopTimer2.reset();
+                loopTimer2.startTime();
+                while(loopTimer2.seconds()<=1)
+                {
+                    intakeArmPower = 0.3;
+                    telemetry.addData("Setting Power for Intake Arm"," ");
+                    telemetry.update();
+                }
+                loopTimer2.reset();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            double upDown = cap*-.3;
-
-            if (upDown > 0.0){
-                rackPowerUD = Range.clip(upDown, -1.0, 1.0);
             }
-            else if (upDown < 0.0) {
-                rackPowerUD = Range.clip(upDown, -1.0, 1.0);
-            }
-            else {
-                upDown = 0.0;
-                rackPowerUD = 0.0;
-            }
+*/
 
-            double side = gamepad2.left_stick_x;
 
-            if (side > 0.0){
-                rackPowerLR = Range.clip(side, -1.0, 1.0);
-            }
-            else if (side < 0.0) {
-                rackPowerLR = Range.clip(side, -1.0, 1.0);
-            }
-            else {
-                side = 0.0;
-                rackPowerLR = 0.0;
-            }
 
             // Send calculated power to wheels
             leftfr.setPower(leftfrPower);
@@ -414,13 +538,8 @@ public class TeleOpMode extends LinearOpMode {
             rightWheels.setPower(rightPower);
 
             //arm movement power
-            rackPinionLR.setPower(rackPowerLR);
-            rackPinionUD.setPower(rackPowerUD);
-
-
-
-
-
+            intakeArm.setPower(intakeArmPower);
+            intakeArm.setPower(intakeArmSlowPower);
 
 
             // Show the elapsed game time and wheel power.
@@ -429,15 +548,29 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("Servos", "left wheels (%.2f), right wheel (%.2f)", leftPower, rightPower);
             telemetry.addData("lhook", lhook);
             telemetry.addData("rhook", rhook);
+            telemetry.addData("A: ", gamepad2.a);
+            telemetry.addData("B:", gamepad2.b);
+            telemetry.addData("Left Power from Servo", leftWheels.getPower());
+            telemetry.addData("Right Power from Servo", rightWheels.getPower());
+            telemetry.addData("Port Number", rightWheels.getPortNumber());
+            telemetry.addData("Port Number", leftWheels.getPortNumber());
+            telemetry.addData("IntakeArmSlowPower Variable", intakeArmSlowPower);
+            telemetry.addData("Intake Arm Variable Power: ", intakeArmPower);
+            telemetry.addData("Intake Arm Port : ", intakeArm.getPortNumber());
+
+            telemetry.update();
+
 
 
             // Rev2mDistanceSensor specific methods.
 
             telemetry.update();
-
         }
     }
 }
+
+
+
 
 
 
