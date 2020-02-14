@@ -538,7 +538,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
             ElapsedTime LoopTimer = new ElapsedTime();
             LoopTimer.reset();
             LoopTimer.startTime();
-            while (LoopTimer.seconds() < 2) {
+            while (LoopTimer.seconds() < 1) {
                 for (VuforiaTrackable trackable : allTrackables) {
                     if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
                         telemetry.addData("Skystone:", "Visible Position 6");
@@ -548,13 +548,19 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                         location2 = 3;
                         boolean counterClockwise = true;
                         targetsSkyStone.deactivate();
-                        MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback);
+                        MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback,0);
                         sleep(300);
                         AcuTurn(-90, true);
                         DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
-                        GoingToWall(rightback, rightfr, leftfr, leftback);
-                        AcuTurnOpposite(86,true);
-                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,runTime, location2);
+                        GoingToWall(rightback, rightfr, leftfr, leftback, location2);
+                        AcuTurnOpposite(80,true);
+
+                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
+                        MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
+                        AcuTurn(-90, true);
+                        DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                        Parking(rightback, rightfr, leftfr, leftback);
+
                        // AcuTurn(90,false);
                         // DeliverySkystone2 (rightback, rightfr, leftfr, leftback, location2);
                          // Parking(rightback, rightfr, leftfr, leftback);
@@ -588,7 +594,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 ElapsedTime LoopTimer2 = new ElapsedTime();
                 LoopTimer2.reset();
                 LoopTimer2.startTime();
-                while (LoopTimer2.seconds() < 2) {
+                while (LoopTimer2.seconds() < 1) {
                     for (VuforiaTrackable trackable : allTrackables) {
                         if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
 //                            OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
@@ -601,13 +607,25 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                             location = 5;
                             location2 = 2;
                             boolean counterClockwise = true;
-                            MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback);
+                            MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, 0);
                             AcuTurn(-90, true);
                             DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
-                            GoingToWall(rightback, rightfr, leftfr, leftback);
-                            AcuTurnOpposite(90, true);
-                            runTime=0.2;
+                            autoHook.setPosition(0.1);
+                            //tmove(.2,0,0,.35,0);
+                            GoingToWall(rightback, rightfr, leftfr, leftback, location2);
+
+                            AcuTurnOpposite(80, true);
+                            runTime=0.46;
                             EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,runTime, location2);
+
+                            sleep(200);
+                            MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
+
+                            tmove(.07, runtime.seconds(), 0,0,.8);
+
+                            AcuTurn(-90, true);
+                            DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                            Parking(rightback, rightfr, leftfr, leftback);
 
                             //  DeliverySkystone2 (rightback, rightfr, leftfr, leftback, location2);
 //                            Parking(rightback, rightfr, leftfr, leftback);
@@ -622,7 +640,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
             if (skystoneVisible == false) {
                 initTime = 0;
-                runTime=0.8;
+                runTime=0.7;
                 EncoderStrafe(rightback, rightfr, leftfr, leftback, initTime, runTime);
                 telemetry.addData("Skystone:", "Assumed Position 4");
                 telemetry.update();
@@ -631,13 +649,21 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 location2 = 1;
                 boolean counterClockwise = true;
                 targetsSkyStone.deactivate();
-                MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback);
+                MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, 0);
                 AcuTurn(-90, true);
                 DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
-                GoingToWall(rightback, rightfr, leftfr, leftback);
-                AcuTurnOpposite(88,true);
-                EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, initTime, runTime, location2);
-               // DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                GoingToWall(rightback, rightfr, leftfr, leftback, location2);
+                AcuTurnOpposite(80,true);
+                EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, initTime, 1, location2);
+                tmove(.3,runtime.seconds(),0,.8,0);
+
+                MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
+                AcuTurnOpposMOD(83,true);
+                DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+
+
+
+                // DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
                // Parking(rightback, rightfr, leftfr, leftback);
                 stop();
             }
@@ -729,18 +755,112 @@ public class VuforiaSkystonePosition extends LinearOpMode {
     // }
     // }
 
-    public void GoingToWall(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback) {
+    public void tmove(double runSeconds, double presentRuntime, double turnPower, double straifPower, double tankPower)
+
+    {
+
+        while(runtime.seconds() < (runSeconds+presentRuntime))
+        {
+            bMove(turnPower, straifPower, tankPower);
+
+        }
+    }
+
+    public void bMove(double turnPower, double straifPower, double tankPower )
+    {
+        double leftfrPower;
+        double leftbackPower;
+        double rightfrPower;
+        double rightbackPower;
+
+
+        turnPower = turnPower*-1;
+
+        tankPower = tankPower*-1;
+
+        if (turnPower < -0.1) {
+            leftfrPower = Range.clip(-turnPower, -1.0, 1.0);
+            leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
+            rightfrPower = Range.clip(turnPower, -1.0, 1.0);
+            rightbackPower = Range.clip(turnPower, -1.0, 1.0);
+        } else if (turnPower > 0.1) {
+            leftfrPower = Range.clip(-turnPower, -1.0, 1.0);
+            leftbackPower = Range.clip(-turnPower, -1.0, 1.0);
+            rightfrPower = Range.clip(turnPower, -1.0, 1.0);
+            rightbackPower = Range.clip(turnPower, -1.0, 1.0);
+        } else if (straifPower < -0.1) {
+            leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
+            leftbackPower = Range.clip(straifPower, -1.0, 1.0);
+            rightfrPower = Range.clip(straifPower, -1.0, 1.0);
+            rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
+        } else if (straifPower > 0.1) {
+            leftfrPower = Range.clip(-straifPower, -1.0, 1.0);
+            leftbackPower = Range.clip(straifPower, -1.0, 1.0);
+            rightfrPower = Range.clip(straifPower, -1.0, 1.0);
+            rightbackPower = Range.clip(-straifPower, -1.0, 1.0);
+        } else if (tankPower < -0.1) {
+            leftbackPower = Range.clip(tankPower, -1.0, 1.0);
+            rightbackPower = Range.clip(tankPower, -1.0, 1.0);
+            leftfrPower = Range.clip(tankPower, -1.0, 1.0);
+            rightfrPower = Range.clip(tankPower, -1.0, 1.0);
+        } else if (tankPower > 0.1) {
+            leftfrPower = Range.clip(tankPower, -1.0, 1.0);
+            rightfrPower = Range.clip(tankPower, -1.0, 1.0);
+            leftbackPower = Range.clip(tankPower, -1.0, 1.0);
+            rightbackPower = Range.clip(tankPower, -1.0, 1.0);
+        } else {
+            tankPower = 0.0;
+            turnPower = 0.0;
+            leftfrPower = Range.clip(tankPower, -1.0, 1.0);
+            rightfrPower = Range.clip(tankPower, -1.0, 1.0);
+            leftbackPower = Range.clip(tankPower, -1.0, 1.0);
+            rightbackPower = Range.clip(tankPower, -1.0, 1.0);
+        }
+        leftfr.setPower(leftfrPower);
+        leftback.setPower(leftbackPower);
+        rightfr.setPower(rightfrPower);
+        rightback.setPower(rightbackPower);
+
+
+    }
+
+
+    public void GoingToWall(DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback, double location2) {
+
+
 
 
         rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        rightback.setTargetPosition(rightback.getCurrentPosition() - 3200);
-        rightback.setPower(0.50);
+        int move = 0;
+
+        if(location2 == 3)
+        {
+            move = 3200;
+        }
+        if(location2 == 2)
+        {
+            move = 2800;
+        }
+        if (location2 == 1)
+        {
+            move = 3150;
+        }
+
+
+
+
+
+
+        rightback.setTargetPosition(rightback.getCurrentPosition() - move);
+        rightback.setPower(-0.50);
         rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightfr.setPower(-0.50);
         leftfr.setPower(-0.50);
         leftback.setPower(-0.65);
+        ElapsedTime tempTimer = new ElapsedTime();
+        tempTimer.reset();
         while (rightback.isBusy()) {
             if (rightback.getCurrentPosition() <= (rightback.getTargetPosition() + 15)) {
                 leftback.setPower(0);
@@ -760,7 +880,9 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 rightfr.setPower(0.50);
                 leftfr.setPower(0.50);
                 leftback.setPower(0.65);
-                while (rightback.isBusy()) {
+
+
+                while (rightback.isBusy() && tempTimer.seconds() > 2) {
                     if (rightback.getCurrentPosition() <= (rightback.getTargetPosition() + 15)) {
                         leftback.setPower(0);
                         rightback.setPower(0);
@@ -789,7 +911,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
             telemetry.update();
             rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightback.setTargetPosition(rightback.getCurrentPosition() - 1000);
+            rightback.setTargetPosition(rightback.getCurrentPosition() - 500);
             rightback.setPower(0.50);
             rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightfr.setPower(-0.50);
@@ -816,15 +938,24 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         {
             rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY);
+            rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY + 500);
             rightback.setPower(0.80);
             rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightfr.setPower(0.80);
             leftfr.setPower(0.80);
             leftback.setPower(0.9);
+            if(location2 == 1)
+            {
+                rightback.setTargetPosition(rightback.getCurrentPosition() - DELIVERY - 500);
+
+            }
+            else{
+                rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY + 500);
+
+            }
             while (rightback.isBusy()) {
 
-                if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 15)) {
+                if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() + 15)) {
                     leftback.setPower(0);
                     rightback.setPower(0);
                     rightfr.setPower(0);
@@ -840,6 +971,13 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
                 }
             }
+            autoHook.setPosition(0.1);
+            leftfr.setDirection(DcMotor.Direction.FORWARD);
+            leftback.setDirection(DcMotor.Direction.FORWARD);
+            rightfr.setDirection(DcMotor.Direction.REVERSE);
+            rightback.setDirection(DcMotor.Direction.REVERSE);
+
+
 
 
         }
@@ -852,13 +990,13 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         switch (location)
         {
             case 6:
-                rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY);
+                rightback.setTargetPosition(rightback.getCurrentPosition() + (DELIVERY +30));
                 break;
             case 5:
                 rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY);
                 break;
             case 4:
-                rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY-200);
+                rightback.setTargetPosition(rightback.getCurrentPosition() + (DELIVERY +50)) ;
                 break;
         }
 
@@ -886,7 +1024,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 }
             }
 
-        }
+        }//
         public void EncoderMove (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor
         leftback){
 
@@ -926,8 +1064,10 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         }
 
         public void MovingtoSkystoneAndBack (DcMotor rightback, DcMotor rightfr, DcMotor
-        leftfr, DcMotor leftback){
+        leftfr, DcMotor leftback, double location2){
             newInitTime = runtime.seconds();
+            int back = 0;
+            int forward = 0;
 //        while ((runtime.seconds() - newInitTime) < 1.2) {
 //            rightback.setPower(-0.3);
 //            rightfr.setPower(0.3);
@@ -936,9 +1076,20 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 //            telemetry.addData("Strafing just for Position 1", " ");
 //            telemetry.update();
 //        }
+
+            if(location2 == 2)
+            {
+                 back = -50;
+            }
+
+            if (location2 == 1)
+            {
+                forward = -150;
+                back = -150;
+            }
             rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightback.setTargetPosition(rightback.getCurrentPosition() + TOSKYSTONE);
+            rightback.setTargetPosition(rightback.getCurrentPosition() + TOSKYSTONE + forward);
             rightback.setPower(0.3);
             rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             rightfr.setPower(0.3);
@@ -972,7 +1123,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                     autoHook.setPosition(1);
                     rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     sleep(1000);
-                    rightback.setTargetPosition(-TOSKYSTONE + 100);
+                    rightback.setTargetPosition(-TOSKYSTONE + 100 + back);
                     rightback.setPower(0.2);
                     rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     rightfr.setPower(-0.2);
@@ -1065,8 +1216,26 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
         leftfr.setPower(0);
         leftback.setPower(0);
     }
-    if (location2==1 || location2==2)
+    if ( location2==2)
     {
+        while ((runtime.seconds() - initTime) < runTime) {
+            rightback.setPower(-0.4);
+            rightfr.setPower(0.4);
+            leftfr.setPower(-0.4);
+            leftback.setPower(0.6);
+            telemetry.addData("Strafing", " ");
+            telemetry.update();
+        }
+        rightback.setPower(0);
+        rightfr.setPower(0);
+        leftfr.setPower(0);
+        leftback.setPower(0);
+    }
+
+
+    if (location2==1)
+    {
+
         while ((runtime.seconds() - initTime) < runTime) {
             rightback.setPower(-0.4);
             rightfr.setPower(0.4);
@@ -1164,7 +1333,105 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
             instance = instance.setScale(round2DecimalPlace, RoundingMode.HALF_UP);
 
         }
-public void AcuTurnOpposite (double Degrees, boolean counterClockwise) {
+
+    public void AcuTurnOpposMOD (double Degrees, boolean counterClockwise) {
+        Degrees = (Math.abs(Degrees));
+        double moved = 0;
+
+        double lastHead;
+
+
+        telemetry.addData("Test Uday", true);
+        telemetry.update();
+        initHeading = angles.firstAngle;
+        lastHead = angles.firstAngle;
+        telemetry.addData("TestSTATEMENT:", moved != Degrees);
+        telemetry.addData("Heading: ", angles.firstAngle);
+
+        while (moved < (Degrees - 3)) {
+            rightback.setDirection(DcMotor.Direction.FORWARD);
+            rightfr.setDirection(DcMotor.Direction.FORWARD);
+            leftfr.setDirection(DcMotor.Direction.FORWARD);
+            leftback.setDirection(DcMotor.Direction.FORWARD);
+
+            telemetry.addData("Test Data", Degrees - Math.abs(angles.firstAngle - initHeading));
+            telemetry.addData("Test Data 2", Math.abs(angles.firstAngle - initHeading));
+            telemetry.addData("Moved: ", moved);
+            telemetry.addData("Degrees: ", Degrees);
+            telemetry.addData("Velocity", imu.getVelocity());
+
+
+            if (counterClockwise == true) {
+                if ((Degrees - moved) > 70) {
+                    leftfr.setPower(.3);
+                    leftback.setPower(.3);
+                    rightfr.setPower(.67);
+                    rightback.setPower(.67);
+                } else {
+                    if ((Degrees - moved) > 40) {
+                        leftfr.setPower(.2625);
+                        leftback.setPower(.2625);
+                        rightfr.setPower(.4975);
+                        rightback.setPower(.4975);
+                    } else {
+                        if ((Degrees - moved) > 30) {
+                            leftfr.setPower(.1775);
+                            leftback.setPower(.1775);
+                            rightfr.setPower(.3425);
+                            rightback.setPower(.3425);
+                        }
+
+                        if ((Degrees - moved) > 10) {
+                            leftfr.setPower(.2);
+                            leftback.setPower(.2);
+                            rightfr.setPower(.3);
+                            rightback.setPower(.3);
+                        } else {
+                            if ((Degrees - moved) > 5) {
+                                leftfr.setPower(.15);
+                                leftback.setPower(.15);
+                                rightfr.setPower(.15);
+                                rightback.setPower(.15);
+                            }
+                        }
+                    }
+                }
+
+            } else {
+                leftfr.setPower(-.2);
+                leftback.setPower(-.2);
+                rightfr.setPower(-.2);
+                rightback.setPower(-.2);
+            }
+
+
+            moved = moved + (Math.abs(angles.firstAngle - lastHead));
+            lastHead = angles.firstAngle;
+            telemetry.update();
+
+
+        }
+        sleep(500);
+        telemetry.addData("Setting Power to 0", true);
+        telemetry.update();
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
+        leftfr.setDirection(DcMotor.Direction.FORWARD);
+        leftback.setDirection(DcMotor.Direction.FORWARD);
+        rightfr.setDirection(DcMotor.Direction.REVERSE);
+        rightback.setDirection(DcMotor.Direction.REVERSE);
+
+    }/////////////////
+
+
+
+
+
+
+
+    public void AcuTurnOpposite (double Degrees, boolean counterClockwise) {
     Degrees = (Math.abs(Degrees));
     double moved = 0;
 

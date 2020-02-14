@@ -165,7 +165,7 @@ public class SensorBNO055IMU extends LinearOpMode
 //            tmove(2, runtime.seconds(), 0,0,0);
             //VIMove(0,100,.2);
 
-            straightMove(.5, 4.5);
+
 
 
 
@@ -209,7 +209,7 @@ public class SensorBNO055IMU extends LinearOpMode
             if (Math.abs(angles.firstAngle - initHeading) > 1)
             {
 
-                double adjust = -Range.scale(Range.clip(Math.abs(angles.firstAngle - initHeading), 0, 5.5),0, 20, 0,1 );
+                double adjust = -Range.scale(Range.clip(Math.abs(angles.firstAngle - initHeading), 0, 8),0, 20, 0,1 );
                 if((angles.firstAngle - initHeading) > 0)
                 {
                     leftPower = leftPower + adjust;
@@ -293,6 +293,8 @@ public class SensorBNO055IMU extends LinearOpMode
 
 
 
+
+
             runtime.reset();
             while(runtime.seconds() < time)
             {
@@ -306,24 +308,31 @@ public class SensorBNO055IMU extends LinearOpMode
                     double adjust = -Range.scale(Range.clip(Math.abs(angles.firstAngle - initHeading), 0, 25),0, 25, 0,1 );
                     if((angles.firstAngle - initHeading) > 0)
                     {
-                        leftDiag = leftDiag + adjust;
-                        rightDiag = rightDiag - adjust;
+                        leftbackPower = leftbackPower + adjust;
+                        rightfrPower = rightfrPower + adjust;
+                        leftfrPower = leftfrPower - adjust;
+                        rightbackPower = leftfrPower - adjust;
                     }else
                     {
-                        leftDiag = leftDiag - adjust;
-                        rightDiag = rightDiag + adjust;
+                        leftbackPower = leftbackPower - adjust;
+                        rightfrPower = rightfrPower - adjust;
+                        leftfrPower = leftfrPower + adjust;
+                        rightbackPower = leftfrPower + adjust;
                     }
                     telemetry.addData("Adjusting", true);
                     telemetry.addData("Adjust:", adjust);
                 }
 
 
+                telemetry.addData("Left FR", leftfr.getPower());
+                telemetry.addData("Left BC", leftback.getPower());
+                telemetry.addData("Right FR", rightfr.getPower());
+                telemetry.addData("Right BK", rightback.getPower());
 
-
-                leftfr.setPower(Range.clip(rightDiag, Constants.MIN_POWER, Constants.MAX_POWER));
-                leftback.setPower(Range.clip(-leftDiag, Constants.MIN_POWER, Constants.MAX_POWER));
-                rightfr.setPower(Range.clip(-leftDiag, Constants.MIN_POWER, Constants.MAX_POWER));
-                rightback.setPower(Range.clip(rightDiag, Constants.MIN_POWER, Constants.MAX_POWER));
+                leftfr.setPower(Range.clip(leftfrPower, Constants.MIN_POWER, Constants.MAX_POWER));
+                leftback.setPower(Range.clip(-leftbackPower, Constants.MIN_POWER, Constants.MAX_POWER));
+                rightfr.setPower(Range.clip(-rightfrPower, Constants.MIN_POWER, Constants.MAX_POWER));
+                rightback.setPower(Range.clip(rightbackPower, Constants.MIN_POWER, Constants.MAX_POWER));
 
 
 
@@ -782,7 +791,9 @@ public class SensorBNO055IMU extends LinearOpMode
 
     }
 
-    //----------------------------------------------------------------------------------------------
+
+
+        //----------------------------------------------------------------------------------------------
     // Telemetry Configuration
     //----------------------------------------------------------------------------------------------
 
