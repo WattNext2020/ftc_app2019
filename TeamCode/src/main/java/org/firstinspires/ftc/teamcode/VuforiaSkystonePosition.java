@@ -139,7 +139,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@Autonomous(name="SKYSTONE Vuforia Position UPDATE", group ="Concept")
+@Autonomous(name="SKYSTONE Vuforia Position UPDATE RED", group ="Concept")
 public class VuforiaSkystonePosition extends LinearOpMode {
 
     // State used for updating telemetry
@@ -658,7 +658,9 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 tmove(.3,runtime.seconds(),0,.8,0);
 
                 MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
-                AcuTurnOpposMOD(83,true);
+                tmove(.3,runtime.seconds(),0,.8,0);
+
+                AcuTurn(88,true);
                 DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
 
 
