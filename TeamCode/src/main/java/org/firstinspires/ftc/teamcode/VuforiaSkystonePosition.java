@@ -589,7 +589,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 LoopTimer.reset();
                 telemetry.addData("Not in Position 1", " ");
                 telemetry.update();
-                runTime=0.8;
+                runTime=0.65;
                 EncoderStrafe(rightback, rightfr, leftfr, leftback, initTime, runTime);
                 ElapsedTime LoopTimer2 = new ElapsedTime();
                 LoopTimer2.reset();
@@ -640,7 +640,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
             if (skystoneVisible == false) {
                 initTime = 0;
-                runTime=0.7;
+                runTime=0.5;
                 EncoderStrafe(rightback, rightfr, leftfr, leftback, initTime, runTime);
                 telemetry.addData("Skystone:", "Assumed Position 4");
                 telemetry.update();
@@ -655,7 +655,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 GoingToWall(rightback, rightfr, leftfr, leftback, location2);
                 AcuTurnOpposite(80,true);
                 EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, initTime, 1, location2);
-                tmove(.3,runtime.seconds(),0,.8,0);
+                tmove(.4,runtime.seconds(),0,.8,0);
 
                 MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
                 tmove(.3,runtime.seconds(),0,.8,0);
@@ -1553,11 +1553,18 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
 
                 if (Clockwise == true) {
                     if ((Degrees - moved) > 70) {
+                        leftfr.setPower(.5);
+                        leftback.setPower(.5);
+                        rightfr.setPower(.5);
+                        rightback.setPower(.5);
+                    }
+                    if ((Degrees - moved) > 50) {
                         leftfr.setPower(.45);
                         leftback.setPower(.45);
                         rightfr.setPower(.45);
                         rightback.setPower(.45);
-                    } else {
+                    }
+                    else {
                         if ((Degrees - moved) > 40) {
                             leftfr.setPower(.35);
                             leftback.setPower(.35);
@@ -1565,6 +1572,12 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
                             rightback.setPower(.35);
                         } else {
                             if ((Degrees - moved) > 30) {
+                                leftfr.setPower(.3);
+                                leftback.setPower(.3);
+                                rightfr.setPower(.3);
+                                rightback.setPower(.3);
+                            }
+                            if ((Degrees - moved) > 20) {
                                 leftfr.setPower(.25);
                                 leftback.setPower(.25);
                                 rightfr.setPower(.25);
@@ -1572,10 +1585,10 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
                             }
 
                             if ((Degrees - moved) > 10) {
-                                leftfr.setPower(.2);
-                                leftback.setPower(.2);
-                                rightfr.setPower(.2);
-                                rightback.setPower(.2);
+                                leftfr.setPower(.22);
+                                leftback.setPower(.22);
+                                rightfr.setPower(.22);
+                                rightback.setPower(.22);
                             } else {
                                 if ((Degrees - moved) > 5) {
                                     leftfr.setPower(.2);
