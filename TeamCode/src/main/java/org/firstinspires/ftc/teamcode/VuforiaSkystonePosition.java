@@ -956,7 +956,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
             if(location2 == 1)
             {
-                rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY + 500);
+                rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY - 100);
 
             }
             else{
