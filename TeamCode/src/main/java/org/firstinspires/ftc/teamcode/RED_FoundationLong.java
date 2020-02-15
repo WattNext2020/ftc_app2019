@@ -57,6 +57,10 @@ public class RED_FoundationLong extends LinearOpMode {
 
     private DistanceSensor sensorRange;
 
+    Servo newCap;
+
+
+
     double leftfrPower;
     double leftbackPower;
     double rightfrPower;
@@ -81,12 +85,15 @@ public class RED_FoundationLong extends LinearOpMode {
         rightfr = hardwareMap.get(DcMotor.class, "rightf");
         rightback = hardwareMap.get(DcMotor.class, "rightb");
 
+        leftWheels = hardwareMap.get(CRServo.class, "lw");   //leftwheels
+        rightWheels = hardwareMap.get(CRServo.class, "rw");  //rightwheels
+       // capStone = hardwareMap.get (CRServo.class, "Cap");  // Rack and Pinion Vertical
+       // rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");   //Rack and Pinion Horizontal
+        rightHook = hardwareMap.get(Servo.class,"rightHook");
+        leftHook = hardwareMap.get(Servo.class,"leftHook");
+        newCap = hardwareMap.get(Servo.class, "NewCap");
 
-        //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
-        //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
-
-        leftHook = hardwareMap.get(Servo.class, "leftHook");
-        rightHook = hardwareMap.get(Servo.class, "rightHook");
+        newCap.setPosition(0);
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -108,6 +115,10 @@ public class RED_FoundationLong extends LinearOpMode {
 
         leftHook.setPosition(0);
         rightHook.setPosition(0);
+
+        leftWheels.setPower(0);
+        rightWheels.setPower(0);
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -160,7 +171,7 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightHook.setPosition(0);
             }
 
-            while(runtime.seconds()<7.63) //turn a little bit
+            while(runtime.seconds()<7.9) //turn a little bit
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);
@@ -168,7 +179,7 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightback.setPower(0.5);
             }
 
-            while(runtime.seconds()<9.7)  //strafe right
+            while(runtime.seconds()<9.9)  //strafe left
             {
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);
@@ -176,7 +187,7 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightback.setPower(0.5);
             }
 
-            while(runtime.seconds()<10.3) //backward
+            while(runtime.seconds()<10.5) //backward
             {
 
                 leftfr.setPower(0.5);
@@ -185,13 +196,13 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightback.setPower(0.5);
             }
 
-            while (runtime.seconds()<11.3) {
+            while (runtime.seconds()<11.4) {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds()<12.4)
+            while (runtime.seconds()<12.5)
             {
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);
@@ -199,7 +210,7 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightback.setPower(0.5);
 
             }
-            while (runtime.seconds()<12.7)
+            while (runtime.seconds()<12.8)
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);

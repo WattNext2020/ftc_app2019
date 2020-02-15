@@ -4,13 +4,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name= "TeleOp UPDATED", group= "Linear Opmode")
+@TeleOp(name= "TeleOp UPDATE", group= "Linear Opmode")
 
 public class TeleOpMode extends LinearOpMode {
 //@Disabled
@@ -67,6 +68,9 @@ public class TeleOpMode extends LinearOpMode {
     boolean Tank = false;
 
     boolean slowMode = false;
+    int counter;
+    int currentPosition;
+    int c=0;
 
 
     @Override
@@ -104,12 +108,16 @@ public class TeleOpMode extends LinearOpMode {
 
         leftWheels.setDirection(CRServo.Direction.REVERSE);
         rightWheels.setDirection(CRServo.Direction.FORWARD);
+
         intakeArm.setDirection(CRServo.Direction.FORWARD);
+
 
         newCap.setPosition(0);
         ElapsedTime loopTimer = new ElapsedTime();
         ElapsedTime loopTimer2 = new ElapsedTime();
 
+        rightWheels.setPower(0);
+        leftWheels.setPower(0);
 
 
 
@@ -226,21 +234,26 @@ public class TeleOpMode extends LinearOpMode {
 
 
 
-      /*      if(gamepad2.a==true)
+         if(gamepad2.b)
             {
-                leftPower=1;
-                rightPower=1;
+                leftPower=0.75;
+                rightPower=0.75;
+            }
+         if(gamepad2.a) {
+                leftPower = -0.75;
+                rightPower = -0.75;
+            }
+         if(!gamepad2.a&&!gamepad2.b)
+            {
+                leftPower=0;
+                rightPower=0;
             }
 
-            if(gamepad2.b==true) {
-                leftPower = -1;
-                rightPower = -1;
-            }
-           */
 
 
-            double gather = gamepad2.right_stick_y;
 
+
+           double gather = gamepad2.right_stick_y;
 
             leftPower = Range.clip(gather, -1.0, 1.0);
             rightPower = Range.clip(gather, -1.0, 1.0);
@@ -387,31 +400,79 @@ public class TeleOpMode extends LinearOpMode {
 */
 
 
-            double side = gamepad2.left_stick_y;
+            double side = -gamepad2.left_stick_y;
+            double intakeArmSlowPower = -gamepad2.right_stick_y;
 
-            if (side > 0.0) {
-                intakeArmPower = -1;
-            } else if (side < 0.0) {
-                intakeArmPower = 0.75;
+            if (side < -0.1)
+            {
+                intakeArmPower=-1;
+            }
+            else if (side > 0.1)
+            {
+                intakeArmPower=0.75;
             }
 
-            if (leftPower>0&&rightPower>0) {
-                loopTimer2.startTime();
-                while (loopTimer2.seconds() <= 2) {
-                    telemetry.addData("Only Running Outake"," ");
-                    telemetry.update();
+
+            if(intakeArmSlowPower<-0.1)
+            {
+                intakeArmSlowPower=-0.5;
+
+            }
+            if (intakeArmSlowPower>0.1)
+            {
+                intakeArmSlowPower=0.5;
+            }
+
+            if((!(intakeArmSlowPower>0 || intakeArmSlowPower<0)) && (!(side>0 || side<0)))
+            {
+
+                intakeArmSlowPower=0;
+                intakeArmPower=0;
+
+            }
+
+
+
+      /*      if (gamepad2.a)   //braki
+      /*      if (gamepad2.a)   //braking of intakeArm
+            {
+                if(counter==1)  //braking on
+                {
+                    intakeArm.set
 
                 }
-                intakeArmPower = 0.3;
-                telemetry.addData("Setting Power for Intake Arm"," ");
-                telemetry.update();
-                loopTimer2.reset();
-            }
 
-            if(gather==0&&side==0)
-            {
-                intakeArmPower =0;
+
+                if(counter==2) //braking off
+                {
+
+                 counter=1; //
+
+                }
+
             }
+            */
+
+       /*    if (leftPower>0&&rightPower>0) {
+                loopTimer2.startTime();
+                while (loopTimer2.seconds() <= 1) {
+                    telemetry.addData("Only Running Outake"," ");
+                    telemetry.update();
+                    intakeArmPower=0;
+                }
+                loopTimer2.reset();
+                loopTimer2.startTime();
+                while(loopTimer2.seconds()<=1)
+                {
+                    intakeArmPower = 0.3;
+                    telemetry.addData("Setting Power for Intake Arm"," ");
+                    telemetry.update();
+                }
+                loopTimer2.reset();
+
+            }
+*/
+
 
 
             // Send calculated power to wheels
@@ -425,7 +486,8 @@ public class TeleOpMode extends LinearOpMode {
             rightWheels.setPower(rightPower);
 
             //arm movement power
-            intakeArm.setPower(intakeArmPower);
+         intakeArm.setPower(intakeArmPower);
+         intakeArm.setPower(intakeArmSlowPower);
 
 
             // Show the elapsed game time and wheel power.
@@ -438,6 +500,11 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("B:", gamepad2.b);
             telemetry.addData("Left Power", leftWheels.getPower());
             telemetry.addData("Right Power", rightWheels.getPower());
+            telemetry.addData("Left Joystick Y: ", side);
+            telemetry.addData("Intake Arm Power: ", intakeArm.getPower());
+            telemetry.addData("Intake Arm : ", intakeArm.getPortNumber());
+
+
 
 
             // Rev2mDistanceSensor specific methods.

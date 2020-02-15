@@ -64,7 +64,11 @@ public class SecondBotTeleOp extends LinearOpMode {
     double rightRPower = 0;
     double leftFPower = 0;
     double rightFPower = 0;
+    double lastBrake = 0;
+    double lastSlow = 0;
 
+    boolean zeroBrake = true;
+    boolean slowMode = false;
 
     @Override
     public void runOpMode() {
@@ -102,9 +106,197 @@ public class SecondBotTeleOp extends LinearOpMode {
             double strafePower = gamepad1.right_stick_x;
             double tankPower = gamepad1.right_stick_y;
             double turnPower = gamepad1.left_stick_x;
+            double diagonal = gamepad1.left_stick_y;
 
+            if (gamepad1.b == true){
+                if ((runtime.seconds() - lastBrake) > .5) { //slow mode threshold
+
+                    if (zeroBrake == true) {
+                        zeroBrake = false;
+                        lastBrake = runtime.seconds();
+                    } else {
+                        zeroBrake = true;
+                        lastBrake = runtime.seconds();
+                    }
+
+                }
+            }
+
+            if (gamepad1.a == true) {
+                if ((runtime.seconds() - lastSlow) > .5) { //slow mode threshold
+
+                    if (slowMode == true) {
+
+                        slowMode = false;
+                        lastSlow = runtime.seconds();
+                    } else {
+
+                        slowMode = true;
+                        lastSlow = runtime.seconds();
+                    }
+
+                }
+            }
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
+            if (zeroBrake == true) {
+                leftFDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //Makes motors brake when set to 0
+                leftRDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightFDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightRDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+            } else {
+                leftFDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //Makes motors brake when set to 0
+                leftRDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                rightFDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                rightRDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            }
+
+
+            if (slowMode == true) {
+                strafePower = strafePower * .5;
+                tankPower = tankPower * .5;
+                turnPower = turnPower * .5;
+            }
+
+            /*
+
+            if(strafePower > 0.5){
+                if(tankPower > 0.5){
+                    leftFPower = 1.0;
+                    rightRPower = 1.0;
+                }
+            }
+            else if(strafePower > 0.5){
+                if(tankPower < -0.5){
+                    leftRPower = -1.0;
+                    rightFPower = -1.0;
+                }
+            }
+            else if(strafePower > 0.5 & tankPower < -0.5){
+
+            }
+            else if(strafePower < -0.5 & tankPower > 0.5){
+                leftRPower = 1.0;
+                rightFPower = 1.0;
+            }
+            else if(strafePower < -0.5 & tankPower < -0.5){
+                leftFPower = -1.0;
+                rightRPower = -1.0;
+            }
+            else if(turnPower < -0.1){
+                leftFPower = Range.clip(-turnPower, -1.0, 1.0);
+                leftRPower = Range.clip(-turnPower, -1.0, 1.0);
+                rightFPower = Range.clip(turnPower, -1.0, 1.0);
+                rightRPower = Range.clip(turnPower, -1.0, 1.0);
+            }
+            else if(turnPower > 0.1){
+                leftFPower = Range.clip(-turnPower, -1.0, 1.0);
+                leftRPower = Range.clip(-turnPower, -1.0, 1.0);
+                rightFPower = Range.clip(turnPower, -1.0, 1.0);
+                rightRPower = Range.clip(turnPower, -1.0, 1.0);
+            }
+            else if(strafePower < -0.1){
+                leftFPower = Range.clip(-strafePower, -1.0, 1.0);
+                leftRPower = Range.clip(strafePower, -1.0, 1.0);
+                rightFPower = Range.clip(strafePower, -1.0, 1.0);
+                rightRPower = Range.clip(-strafePower, -1.0, 1.0);
+            }
+            else if(strafePower > 0.1){
+                leftFPower = Range.clip(-strafePower, -1.0, 1.0);
+                leftRPower = Range.clip(strafePower, -1.0, 1.0);
+                rightFPower = Range.clip(strafePower, -1.0, 1.0);
+                rightRPower = Range.clip(-strafePower, -1.0, 1.0);
+            }
+            else if(tankPower < -0.1){
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+            }
+            else if(tankPower > 0.1){
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+            }
+            else{
+                tankPower = 0.0;
+                turnPower = 0.0;
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+
+            }
+
+            */
+
+            /*
+            if(strafePower > 0.5 & tankPower > 0.5){
+                leftFPower = 1.0;
+                rightRPower = 1.0;
+            }
+            else if(strafePower > 0.5 & tankPower < -0.5){
+                leftRPower = -1.0;
+                rightFPower = -1.0;
+            }
+            else if(strafePower < -0.5 & tankPower > 0.5){
+                leftRPower = 1.0;
+                rightFPower = 1.0;
+            }
+            else if(strafePower < -0.5 & tankPower < -0.5){
+                leftFPower = -1.0;
+                rightRPower = -1.0;
+            }
+            else if(turnPower < -0.1){
+                leftFPower = Range.clip(-turnPower, -1.0, 1.0);
+                leftRPower = Range.clip(-turnPower, -1.0, 1.0);
+                rightFPower = Range.clip(turnPower, -1.0, 1.0);
+                rightRPower = Range.clip(turnPower, -1.0, 1.0);
+            }
+            else if(turnPower > 0.1){
+                leftFPower = Range.clip(-turnPower, -1.0, 1.0);
+                leftRPower = Range.clip(-turnPower, -1.0, 1.0);
+                rightFPower = Range.clip(turnPower, -1.0, 1.0);
+                rightRPower = Range.clip(turnPower, -1.0, 1.0);
+            }
+            else if(strafePower < -0.1){
+                leftFPower = Range.clip(-strafePower, -1.0, 1.0);
+                leftRPower = Range.clip(strafePower, -1.0, 1.0);
+                rightFPower = Range.clip(strafePower, -1.0, 1.0);
+                rightRPower = Range.clip(-strafePower, -1.0, 1.0);
+            }
+            else if(strafePower > 0.1){
+                leftFPower = Range.clip(-strafePower, -1.0, 1.0);
+                leftRPower = Range.clip(strafePower, -1.0, 1.0);
+                rightFPower = Range.clip(strafePower, -1.0, 1.0);
+                rightRPower = Range.clip(-strafePower, -1.0, 1.0);
+            }
+            else if(tankPower < -0.1){
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+            }
+            else if(tankPower > 0.1){
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+            }
+            else{
+                tankPower = 0.0;
+                turnPower = 0.0;
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
+
+            }
+
+            */
 
             if(turnPower < -0.1){
                 leftFPower = Range.clip(-turnPower, -1.0, 1.0);
@@ -112,37 +304,45 @@ public class SecondBotTeleOp extends LinearOpMode {
                 rightFPower = Range.clip(turnPower, -1.0, 1.0);
                 rightRPower = Range.clip(turnPower, -1.0, 1.0);
             }
-            if(turnPower > 0.1){
+            else if(turnPower > 0.1){
                 leftFPower = Range.clip(-turnPower, -1.0, 1.0);
                 leftRPower = Range.clip(-turnPower, -1.0, 1.0);
                 rightFPower = Range.clip(turnPower, -1.0, 1.0);
                 rightRPower = Range.clip(turnPower, -1.0, 1.0);
             }
-            if(strafePower < -0.1){
+            else if(strafePower < -0.1){
                 leftFPower = Range.clip(-strafePower, -1.0, 1.0);
                 leftRPower = Range.clip(strafePower, -1.0, 1.0);
                 rightFPower = Range.clip(strafePower, -1.0, 1.0);
                 rightRPower = Range.clip(-strafePower, -1.0, 1.0);
             }
-            if(strafePower > 0.1){
+            else if(strafePower > 0.1){
                 leftFPower = Range.clip(-strafePower, -1.0, 1.0);
                 leftRPower = Range.clip(strafePower, -1.0, 1.0);
                 rightFPower = Range.clip(strafePower, -1.0, 1.0);
                 rightRPower = Range.clip(-strafePower, -1.0, 1.0);
             }
-            if(tankPower < -0.1){
+            else if(tankPower < -0.1){
                 leftFPower = Range.clip(tankPower, -1.0, 1.0);
                 leftRPower = Range.clip(tankPower, -1.0, 1.0);
                 rightFPower = Range.clip(tankPower, -1.0, 1.0);
                 rightRPower = Range.clip(tankPower, -1.0, 1.0);
             }
-            if(tankPower > 0.1){
+            else if(tankPower > 0.1){
                 leftFPower = Range.clip(tankPower, -1.0, 1.0);
                 leftRPower = Range.clip(tankPower, -1.0, 1.0);
                 rightFPower = Range.clip(tankPower, -1.0, 1.0);
                 rightRPower = Range.clip(tankPower, -1.0, 1.0);
             }
+            else{
+                tankPower = 0.0;
+                turnPower = 0.0;
+                leftFPower = Range.clip(tankPower, -1.0, 1.0);
+                rightFPower = Range.clip(tankPower, -1.0, 1.0);
+                leftRPower = Range.clip(tankPower, -1.0, 1.0);
+                rightRPower = Range.clip(tankPower, -1.0, 1.0);
 
+            }
 
             // Send calculated power to wheels
             leftFDrive.setPower(leftFPower);
@@ -152,7 +352,7 @@ public class SecondBotTeleOp extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftRPower, rightRPower, leftFPower, rightFPower);
+            telemetry.addData("Motors", "leftr (%.2f), rightr (%.2f), leftf(%.2f), rightf(%.2f)", leftRPower, rightRPower, leftFPower, rightFPower);
             telemetry.update();
         }
     }
