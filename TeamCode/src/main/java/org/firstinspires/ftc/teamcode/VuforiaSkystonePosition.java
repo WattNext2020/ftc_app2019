@@ -661,7 +661,19 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 tmove(.3,runtime.seconds(),0,.8,0);
 
                 AcuTurn(88,true);
+                initTime = runtime.seconds();
+
+                while(runtime.seconds() - initTime > .4)
+                {
+                    rightback.setPower(0.60);
+                    rightfr.setPower(-0.60);
+                    leftfr.setPower(0.6);
+                    leftback.setPower(-0.75);
+                }
                 DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                Parking(rightback, rightfr, leftfr, leftback);
+
+
 
 
 
@@ -940,21 +952,22 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         {
             rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY + 500);
-            rightback.setPower(0.80);
-            rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightfr.setPower(0.80);
-            leftfr.setPower(0.80);
-            leftback.setPower(0.9);
+           // rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY + 500);
+
             if(location2 == 1)
             {
-                rightback.setTargetPosition(rightback.getCurrentPosition() - DELIVERY - 500);
+                rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY + 500);
 
             }
             else{
                 rightback.setTargetPosition(rightback.getCurrentPosition() + DELIVERY + 500);
 
             }
+            rightback.setPower(1);
+            rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightfr.setPower(1);
+            leftfr.setPower(1);
+            leftback.setPower(1);
             while (rightback.isBusy()) {
 
                 if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() + 15)) {
