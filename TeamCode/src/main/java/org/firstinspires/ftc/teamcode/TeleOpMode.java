@@ -279,7 +279,7 @@ public class TeleOpMode extends LinearOpMode {
                 rightPower=0;
             }
 
-             side = -gamepad2.left_stick_y;
+            side = -gamepad2.left_stick_y;
             intakeArmSlowPower = -gamepad2.right_stick_y;
 
             if (side < -0.1)
@@ -293,12 +293,12 @@ public class TeleOpMode extends LinearOpMode {
 
             if(intakeArmSlowPower<-0.1)
             {
-                intakeArmSlowPower=-0.5;
+                intakeArmSlowPower=0.5;
 
             }
             if (intakeArmSlowPower>0.1)
             {
-                intakeArmSlowPower=0.5;
+                intakeArmSlowPower=-0.5;
             }
 
 
