@@ -1,18 +1,18 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
 <Robot type="FirstInspires-FTC">
-    <LynxUsbDevice name="Expansion Hub Portal 1" serialNumber="DQ3DQ4HT" parentModuleAddress="1">
-        <LynxModule name="Expansion Hub 1" port="1">
-            <NeveRest60Gearmotor name="leftf" port="0" />
-            <NeveRest60Gearmotor name="rightf" port="1" />
-            <NeveRest60Gearmotor name="leftb" port="2" />
-            <NeveRest60Gearmotor name="rightb" port="3" />
-            <ContinuousRotationServo name="rw" port="0" />
-            <ContinuousRotationServo name="lw" port="1" />
-            <Servo name="leftHook" port="2" />
-            <Servo name="rightHook" port="3" />
-            <Servo name="NewCap" port="4" />
-            <ContinuousRotationServo name="intakeArm" port="5" />
-            <LynxEmbeddedIMU name="imu" port="0" bus="0" />
-        </LynxModule>
-    </LynxUsbDevice>
+<LynxUsbDevice name="Expansion Hub Portal 1" serialNumber="DQ3DQ4HT" parentModuleAddress="1">
+    <LynxModule name="Expansion Hub 1" port="1">
+        <NeveRest60Gearmotor name="leftf" port="0" />
+        <NeveRest60Gearmotor name="rightf" port="1" />
+        <NeveRest60Gearmotor name="leftb" port="2" />
+        <NeveRest60Gearmotor name="rightb" port="3" />
+        <ContinuousRotationServo name="rw" port="0" />
+        <ContinuousRotationServo name="lw" port="1" />
+        <Servo name="leftHook" port="2" />
+        <Servo name="rightHook" port="3" />
+        <Servo name="NewCap" port="4" />
+        <ContinuousRotationServo name="intakeArm" port="5" />
+        <LynxEmbeddedIMU name="imu" port="0" bus="0" />
+    </LynxModule>
+</LynxUsbDevice>
 </Robot>

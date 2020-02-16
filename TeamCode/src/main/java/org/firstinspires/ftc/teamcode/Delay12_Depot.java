@@ -96,7 +96,7 @@ public class Delay12_Depot extends LinearOpMode {
 
                 }
             }
-            while (runtime.seconds() < 27.1) {
+            while (runtime.seconds() < 26.1) {
                 leftfr.setPower(0.5);
                 leftback.setPower(0.5);
                 rightfr.setPower(0.5);
