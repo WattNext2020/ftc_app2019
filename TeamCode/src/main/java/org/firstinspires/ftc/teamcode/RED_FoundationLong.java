@@ -129,10 +129,10 @@ public class RED_FoundationLong extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
             while (runtime.seconds()< 1){
-                leftfr.setPower(0.5);
-                leftback.setPower(-0.6);
-                rightfr.setPower(-0.5);
-                rightback.setPower(0.5);
+                leftfr.setPower(-0.5);
+                leftback.setPower(0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(-0.5);
             }
             while (runtime.seconds() < 1.4){
                 leftfr.setPower(0.5);
@@ -163,8 +163,8 @@ public class RED_FoundationLong extends LinearOpMode {
             while (runtime.seconds() < 5.8){
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.6);
-                rightfr.setPower(-0.5);
-                rightback.setPower(-0.5);
+                rightfr.setPower(0.5);
+                rightback.setPower(0.5);
             }
             while (runtime.seconds() < 6.5){
                 leftfr.setPower(0.0);
@@ -177,10 +177,10 @@ public class RED_FoundationLong extends LinearOpMode {
 
             while(runtime.seconds()<8)  //strafe LEFT
             {
-                leftfr.setPower(-0.5);
-                leftback.setPower(0.6);
-                rightfr.setPower(0.5);
-                rightback.setPower(-0.5);
+                leftfr.setPower(0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(0.5);
             }
 
             while(runtime.seconds()<9) //backward/straightening
@@ -193,21 +193,26 @@ public class RED_FoundationLong extends LinearOpMode {
             }
             while (runtime.seconds()<10) // strafe right
             {
-                leftfr.setPower(-0.5);
-                leftback.setPower(0.6);
-                rightfr.setPower(0.5);
-                rightback.setPower(-0.5);
+                leftfr.setPower(0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(0.5);
 
             }
-            while (runtime.seconds()<11.8)
+            while (runtime.seconds()<11)
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.6);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
-
             }
-            while (runtime.seconds()<13)
+            while (runtime.seconds() < 11.6){
+                leftfr.setPower(0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds()<12)
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.535);
