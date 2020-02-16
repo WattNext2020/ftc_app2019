@@ -60,7 +60,6 @@ public class RED_FoundationLong extends LinearOpMode {
     Servo newCap;
 
 
-
     double leftfrPower;
     double leftbackPower;
     double rightfrPower;
@@ -87,10 +86,10 @@ public class RED_FoundationLong extends LinearOpMode {
 
         leftWheels = hardwareMap.get(CRServo.class, "lw");   //leftwheels
         rightWheels = hardwareMap.get(CRServo.class, "rw");  //rightwheels
-       // capStone = hardwareMap.get (CRServo.class, "Cap");  // Rack and Pinion Vertical
-       // rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");   //Rack and Pinion Horizontal
-        rightHook = hardwareMap.get(Servo.class,"rightHook");
-        leftHook = hardwareMap.get(Servo.class,"leftHook");
+        // capStone = hardwareMap.get (CRServo.class, "Cap");  // Rack and Pinion Vertical
+        // rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");   //Rack and Pinion Horizontal
+        rightHook = hardwareMap.get(Servo.class, "rightHook");
+        leftHook = hardwareMap.get(Servo.class, "leftHook");
         newCap = hardwareMap.get(Servo.class, "NewCap");
 
         newCap.setPosition(0);
@@ -128,107 +127,104 @@ public class RED_FoundationLong extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-            while (runtime.seconds()< 1){
+            while (runtime.seconds() < 0.8  ) {
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.5);
+                leftback.setPower(0.6);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
             while (runtime.seconds() < 2.16) {
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
+                leftback.setPower(-0.6);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds() < 3.6) {
-                leftfr.setPower(0.0);
-                leftback.setPower(0.0);
-                rightfr.setPower(0.0);
-                rightback.setPower(0.0);
-                leftHook.setPosition(1);
-                rightHook.setPosition(1);
+                while (runtime.seconds() < 3.6) {
+                    leftfr.setPower(0.0);
+                    leftback.setPower(0.0);
+                    rightfr.setPower(0.0);
+                    rightback.setPower(0.0);
+                    leftHook.setPosition(1);
+                    rightHook.setPosition(1);
+                }
+                while (runtime.seconds() < 6.1) { //bring foundation backwards
+                    leftfr.setPower(0.5);
+                    leftback.setPower(0.6);
+                    rightfr.setPower(0.5);
+                    rightback.setPower(0.5);
+                }
+
+                while (runtime.seconds() < 5.04) {
+                    leftfr.setPower(0.5);
+                    leftback.setPower(0.6);
+                    rightfr.setPower(-0.5);
+                    rightback.setPower(-0.5);
+                }
+
+                while (runtime.seconds() < 7.6) {
+                    leftfr.setPower(0.0);
+                    leftback.setPower(0.0);
+                    rightfr.setPower(0.0);
+                    rightback.setPower(0.0);
+                    leftHook.setPosition(0);
+                    rightHook.setPosition(0);
+                }
+
+                while (runtime.seconds() < 7.9) //turn a little bit
+                {
+                    leftfr.setPower(-0.5);
+                    leftback.setPower(-0.6);
+                    rightfr.setPower(0.5);
+                    rightback.setPower(0.5);
+                }
+
+                while (runtime.seconds() < 10.5)  //strafe left
+                {
+                    leftfr.setPower(0.5);
+                    leftback.setPower(-0.5);
+                    rightfr.setPower(-0.5);
+                    rightback.setPower(0.5);
+                }
+
+                while (runtime.seconds() < 11.1) //backward
+                {
+
+                    leftfr.setPower(0.5);
+                    leftback.setPower(0.6);
+                    rightfr.setPower(0.5);
+                    rightback.setPower(0.5);
+                }
+
+                while (runtime.seconds() < 12.1) {
+                    leftfr.setPower(-0.5);
+                    leftback.setPower(-0.6);
+                    rightfr.setPower(-0.5);
+                    rightback.setPower(-0.5);
+                }
+                while (runtime.seconds() < 12.5) {
+                    leftfr.setPower(0.5);
+                    leftback.setPower(-0.6);
+                    rightfr.setPower(-0.5);
+                    rightback.setPower(0.5);
+
+                }
+                while (runtime.seconds() < 12.9) {
+                    leftfr.setPower(-0.5);
+                    leftback.setPower(-0.6);
+                    rightfr.setPower(-0.5);
+                    rightback.setPower(-0.5);
+                }
+
+                leftfr.setPower(0);
+                leftback.setPower(0);
+                rightfr.setPower(0);
+                rightback.setPower(0);
+
+
+                telemetry.addData("Status", "Run Time: " + runtime.toString());
+                telemetry.update();
             }
-            while (runtime.seconds() < 6.1) { //bring foundation backwards
-                leftfr.setPower(0.5);
-                leftback.setPower(0.5);
-                rightfr.setPower(0.5);
-                rightback.setPower(0.5);
-            }
-
-            while (runtime.seconds() < 5.04){
-                leftfr.setPower(0.5);
-                leftback.setPower(0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(-0.5);
-            }
-
-            while (runtime.seconds() < 7.6){
-                leftfr.setPower(0.0);
-                leftback.setPower(0.0);
-                rightfr.setPower(0.0);
-                rightback.setPower(0.0);
-                leftHook.setPosition(0);
-                rightHook.setPosition(0);
-            }
-
-            while(runtime.seconds()<7.9) //turn a little bit
-            {
-                leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(0.5);
-                rightback.setPower(0.5);
-            }
-
-            while(runtime.seconds()<9.9)  //strafe left
-            {
-                leftfr.setPower(0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(0.5);
-            }
-
-            while(runtime.seconds()<10.5) //backward
-            {
-
-                leftfr.setPower(0.5);
-                leftback.setPower(0.5);
-                rightfr.setPower(0.5);
-                rightback.setPower(0.5);
-            }
-
-            while (runtime.seconds()<11.4) {
-                leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(-0.5);
-            }
-            while (runtime.seconds()<12.5)
-            {
-                leftfr.setPower(0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(0.5);
-
-            }
-            while (runtime.seconds()<12.8)
-            {
-                leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(-0.5);
-            }
-
-            leftfr.setPower(0);
-            leftback.setPower(0);
-            rightfr.setPower(0);
-            rightback.setPower(0);
-
-
-
-
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
         }
     }
-}
+
 
