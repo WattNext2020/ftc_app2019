@@ -163,7 +163,7 @@ public class Red_Block_Pickup extends LinearOpMode {
                 telemetry.addData("Turn", "Active");
                 telemetry.update();
             }
-            tmove(.95,runtime.seconds(),-.4, 0,0);
+            tmove(.9,runtime.seconds(),-.5, 0,0);
 
             tmove(1,runtime.seconds(),0,0,0);
             tmove(.6,runtime.seconds(),0,0,.4);
