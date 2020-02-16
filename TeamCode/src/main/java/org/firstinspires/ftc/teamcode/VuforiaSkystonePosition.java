@@ -927,35 +927,35 @@ public class VuforiaSkystonePosition extends LinearOpMode {
     }
 
 
-        public void Parking (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback)
-        {
+    public void Parking (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback)
+    {
 
 
-            telemetry.addData("Parking", " ");
-            telemetry.update();
-            rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightback.setTargetPosition(rightback.getCurrentPosition() - 500);
-            rightback.setPower(0.50);
-            rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightfr.setPower(-0.50);
-            leftfr.setPower(-0.50);
-            leftback.setPower(-0.65);
-            while (rightback.isBusy()) {
-                if (rightback.getCurrentPosition() <= (rightback.getTargetPosition() + 15)) {
-                    leftback.setPower(0);
-                    rightback.setPower(0);
-                    rightfr.setPower(0);
-                    leftfr.setPower(0);
-                    leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                    rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    return;
-                }
+        telemetry.addData("Parking", " ");
+        telemetry.update();
+        rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightback.setTargetPosition(rightback.getCurrentPosition() - 500);
+        rightback.setPower(0.50);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setPower(-0.50);
+        leftfr.setPower(-0.50);
+        leftback.setPower(-0.65);
+        while (rightback.isBusy()) {
+            if (rightback.getCurrentPosition() <= (rightback.getTargetPosition() + 15)) {
+                leftback.setPower(0);
+                rightback.setPower(0);
+                rightfr.setPower(0);
+                leftfr.setPower(0);
+                leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                return;
             }
         }
+    }
 
         public void DeliverySkystone2 (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor
         leftback,int location2)
