@@ -212,6 +212,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
     boolean first = true;
 
     double newInitTime;
+    double startAngle;
 
 
     /*
@@ -534,6 +535,9 @@ public class VuforiaSkystonePosition extends LinearOpMode {
         // Tap the preview window to receive a fresh image.
 
         while (opModeIsActive() && !isStopRequested()) {
+            telemetry.update();
+            startAngle = angles.firstAngle;
+            telemetry.addData("Start", startAngle);
             EncoderMove(rightback, rightfr, leftfr, leftback);
             ElapsedTime LoopTimer = new ElapsedTime();
             LoopTimer.reset();
@@ -553,12 +557,14 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                         AcuTurn(-90, true);
                         DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
                         GoingToWall(rightback, rightfr, leftfr, leftback, location2);
-                        AcuTurnOpposite(80,true);
+                        telemetry.update();
+                        AcuTurnOpposite(80,true,angles.firstAngle);
 
                         EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
                         MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
                         AcuTurn(-90, true);
                         DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                        sleep(500);
                         Parking(rightback, rightfr, leftfr, leftback);
 
                        // AcuTurn(90,false);
@@ -613,8 +619,8 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                             autoHook.setPosition(0.1);
                             //tmove(.2,0,0,.35,0);
                             GoingToWall(rightback, rightfr, leftfr, leftback, location2);
-
-                            AcuTurnOpposite(80, true);
+                            telemetry.update();
+                            AcuTurnOpposite(80, true, angles.firstAngle);
                             runTime=0.46;
                             EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,runTime, location2);
 
@@ -625,6 +631,7 @@ public class VuforiaSkystonePosition extends LinearOpMode {
 
                             AcuTurn(-90, true);
                             DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                            sleep(500);
                             Parking(rightback, rightfr, leftfr, leftback);
 
                             //  DeliverySkystone2 (rightback, rightfr, leftfr, leftback, location2);
@@ -653,7 +660,8 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                 AcuTurn(-90, true);
                 DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
                 GoingToWall(rightback, rightfr, leftfr, leftback, location2);
-                AcuTurnOpposite(80,true);
+                telemetry.update();
+                AcuTurnOpposite(80,true, angles.firstAngle);
                 EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, initTime, 1, location2);
                 tmove(.4,runtime.seconds(),0,.8,0);
 
@@ -671,6 +679,8 @@ public class VuforiaSkystonePosition extends LinearOpMode {
                     leftback.setPower(-0.75);
                 }
                 DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                sleep(500);
+
                 Parking(rightback, rightfr, leftfr, leftback);
 
 
@@ -1358,7 +1368,7 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
 
         telemetry.addData("Test Uday", true);
         telemetry.update();
-        initHeading = angles.firstAngle;
+        initHeading = angles.firstAngle ;
         lastHead = angles.firstAngle;
         telemetry.addData("TestSTATEMENT:", moved != Degrees);
         telemetry.addData("Heading: ", angles.firstAngle);
@@ -1446,7 +1456,7 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
 
 
 
-    public void AcuTurnOpposite (double Degrees, boolean counterClockwise) {
+    public void AcuTurnOpposite (double Degrees, boolean counterClockwise, double initHeading) {
     Degrees = (Math.abs(Degrees));
     double moved = 0;
 
@@ -1455,7 +1465,7 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
 
     telemetry.addData("Test Uday", true);
     telemetry.update();
-    initHeading = angles.firstAngle;
+
     lastHead = angles.firstAngle;
     telemetry.addData("TestSTATEMENT:", moved != Degrees);
     telemetry.addData("Heading: ", angles.firstAngle);
@@ -1642,6 +1652,98 @@ public void EncoderStrafe2nd(DcMotor rightback, DcMotor rightfr, DcMotor leftfr,
             return;
 
         }
+    public void straightMove ( double speed,
+                               double time) // TI
+    {
+        telemetry.update();
+
+        leftfr.setPower(speed);
+        leftback.setPower(speed);
+        rightfr.setPower(speed);
+        rightback.setPower(speed);
+
+        double initHeading = angles.firstAngle;
+
+
+
+        runtime.reset();
+        while(runtime.seconds() < time)
+        {
+            double leftPower = speed, rightPower = speed;
+            telemetry.update();
+
+
+            if (Math.abs(angles.firstAngle - initHeading) > 1)
+            {
+
+                double adjust = -Range.scale(Range.clip(Math.abs(angles.firstAngle - initHeading), 0, 8),0, 20, 0,1 );
+                if((angles.firstAngle - initHeading) > 0)
+                {
+                    leftPower = leftPower + adjust;
+                    rightPower = rightPower - adjust;
+                }else
+                {
+                    leftPower = leftPower - adjust;
+                    rightPower = rightPower + adjust;
+                }
+                telemetry.addData("Adjusting", true);
+                telemetry.addData("Adjust:", adjust);
+            }
+
+
+
+
+            leftfr.setPower(Range.clip(leftPower, Constants.MIN_POWER, Constants.MAX_POWER));
+            leftback.setPower(Range.clip(leftPower, Constants.MIN_POWER, Constants.MAX_POWER));
+            rightfr.setPower(Range.clip(rightPower, Constants.MIN_POWER, Constants.MAX_POWER));
+            rightback.setPower(Range.clip(rightPower, Constants.MIN_POWER, Constants.MAX_POWER));
+
+
+
+        }
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
+
+        telemetry.addData("Change:",angles.firstAngle- initHeading );
+        telemetry.update();
+        sleep(1000);
+
+/*
+        leftfr.setTargetPosition((int)(leftfr.getCurrentPosition() + Math.round(leftInches*Constants.COUNTS_PER_INCH)));
+        leftback.setTargetPosition((int)(leftback.getCurrentPosition() + Math.round(leftInches*Constants.COUNTS_PER_INCH)));
+        rightfr.setTargetPosition((int)(rightfr.getCurrentPosition() + Math.round(rightInches*Constants.COUNTS_PER_INCH)));
+        rightback.setTargetPosition((int)(rightback.getCurrentPosition() + Math.round(rightInches*Constants.COUNTS_PER_INCH)));
+
+        leftfr.setPower(speed);
+        leftback.setPower(speed);
+        rightfr.setPower(speed);
+        rightback.setPower(speed);
+
+        leftfr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightfr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while(leftfr.isBusy() || leftback.isBusy() || rightfr.isBusy() || rightback.isBusy())
+        {
+            telemetry.addData("Running:", true);
+
+        }
+
+        leftfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
+*/
+
+    }
 
 
 
