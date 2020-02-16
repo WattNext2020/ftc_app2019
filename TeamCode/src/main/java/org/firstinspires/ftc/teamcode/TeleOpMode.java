@@ -46,9 +46,12 @@ public class TeleOpMode extends LinearOpMode {
     double rightPower;
     double intakeArmPower;
     double intakeArmSlowPower;
+    double intakeArmCounter = 0;
 
 
     boolean capDown;
+    boolean intakeArmMode = true;
+    boolean intakeArmSlowMode = false;
     double time;
 
 
@@ -279,30 +282,59 @@ public class TeleOpMode extends LinearOpMode {
                 rightPower=0;
             }
 
-            side = -gamepad2.left_stick_y;
-            intakeArmSlowPower = -gamepad2.right_stick_y;
+            side = gamepad2.left_stick_y;
+            intakeArmSlowPower = gamepad2.right_stick_y;
+//
 
-            if (side < -0.1)
-            {
-                intakeArmPower=1;
-            }
-            else if (side > 0.1)
-            {
-                intakeArmPower=-1;
-            }
+//          if(gamepad2.dpad_down)
+//          {
+//              if(intakeArmCounter==1) {
+//                  if(intakeArmSlowMode)
+//                  {
+//                      intakeArmMode = true;
+//                      intakeArmSlowMode=false;
+//                      intakeArmCounter=0;
+//                  }
+//              }
+//              else if(intakeArmCounter==0)
+//              {
+//                  if(intakeArmMode)
+//                  {
+//                      intakeArmSlowMode=true;
+//                      intakeArmMode=false;
+//                      intakeArmCounter=1;
+//                  }
+//              }
+//          }
+//
+//if(intakeArmMode)
+//{
+    if (side < -0.1)
+    {
+        intakeArmPower=-1;
+    }
+    else if (side > 0.1)
+    {
+        intakeArmPower=1;
+    }
+//
+//}
+//if (intakeArmSlowMode)
+//{
+    if(intakeArmSlowPower<-0.1)
+    {
+        intakeArmSlowPower=-0.5;
 
-            if(intakeArmSlowPower<-0.1)
-            {
-                intakeArmSlowPower=0.5;
-
-            }
-            if (intakeArmSlowPower>0.1)
-            {
-                intakeArmSlowPower=-0.5;
-            }
+    }
+    if (intakeArmSlowPower>0.1)
+    {
+        intakeArmSlowPower=0.5;
+    }
 
 
-            if((!(intakeArmSlowPower>0 || intakeArmSlowPower<0)) && (!(side>0 || side<0)))
+
+
+if((!(intakeArmSlowPower>0 || intakeArmSlowPower<0)) && (!(side>0 || side<0)))
             {
                 intakeArmSlowPower=0;
                 intakeArmPower=0;
@@ -557,6 +589,10 @@ public class TeleOpMode extends LinearOpMode {
             telemetry.addData("IntakeArmSlowPower Variable", intakeArmSlowPower);
             telemetry.addData("Intake Arm Variable Power: ", intakeArmPower);
             telemetry.addData("Intake Arm Port : ", intakeArm.getPortNumber());
+            telemetry.addData("Intake Arm Counter",intakeArmCounter);
+            telemetry.addData("Intake Arm DPad Down",gamepad2.dpad_down);
+            telemetry.addData("Intake Arm Mode",intakeArmMode);
+            telemetry.addData("Intake Arm Slow Mode",intakeArmSlowMode);
 
             telemetry.update();
 
@@ -568,7 +604,6 @@ public class TeleOpMode extends LinearOpMode {
         }
     }
 }
-
 
 
 
