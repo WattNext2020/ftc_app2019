@@ -37,9 +37,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name= "Short Straight", group= "Linear Opmode")
+@Autonomous(name= "RED Foundation Long", group= "Linear Opmode")
 
-public class Short_Straight extends LinearOpMode {
+public class RED_FoundationLong extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftfr = null;
@@ -56,6 +56,10 @@ public class Short_Straight extends LinearOpMode {
     private Servo leftHook = null;
 
     private DistanceSensor sensorRange;
+
+    Servo newCap;
+
+
 
     double leftfrPower;
     double leftbackPower;
@@ -81,13 +85,15 @@ public class Short_Straight extends LinearOpMode {
         rightfr = hardwareMap.get(DcMotor.class, "rightf");
         rightback = hardwareMap.get(DcMotor.class, "rightb");
 
-        leftWheels = hardwareMap.get(CRServo.class, "lw");
-        rightWheels = hardwareMap.get(CRServo.class, "rw");
-        //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
-        //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
+        leftWheels = hardwareMap.get(CRServo.class, "lw");   //leftwheels
+        rightWheels = hardwareMap.get(CRServo.class, "rw");  //rightwheels
+        // capStone = hardwareMap.get (CRServo.class, "Cap");  // Rack and Pinion Vertical
+        // rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");   //Rack and Pinion Horizontal
+        rightHook = hardwareMap.get(Servo.class,"rightHook");
+        leftHook = hardwareMap.get(Servo.class,"leftHook");
+        newCap = hardwareMap.get(Servo.class, "NewCap");
 
-        leftHook = hardwareMap.get(Servo.class, "leftHook");
-        rightHook = hardwareMap.get(Servo.class, "rightHook");
+        newCap.setPosition(0);
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -110,6 +116,10 @@ public class Short_Straight extends LinearOpMode {
         leftHook.setPosition(0);
         rightHook.setPosition(0);
 
+        leftWheels.setPower(0);
+        rightWheels.setPower(0);
+
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -118,17 +128,103 @@ public class Short_Straight extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
-
-            while (runtime.seconds()< 0.5){
+            while (runtime.seconds()< 1){
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
+                leftback.setPower(0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(-0.5);
+            }
+            while (runtime.seconds() < 1.4){
+                leftfr.setPower(0.5);
+                leftback.setPower(0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds() < 2.7) {
+                leftfr.setPower(-0.5);
+                leftback.setPower(-0.6);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
-            leftfr.setPower(0.0);
-            leftback.setPower(0.0);
-            rightfr.setPower(0.0);
-            rightback.setPower(0.0);
+            while (runtime.seconds() < 3.5) {
+                leftfr.setPower(0.0);
+                leftback.setPower(0.0);
+                rightfr.setPower(0.0);
+                rightback.setPower(0.0);
+                leftHook.setPosition(1);
+                rightHook.setPosition(1);
+            }
+            while (runtime.seconds() < 5.7) { //bring foundation backwards
+                leftfr.setPower(0.5);
+                leftback.setPower(0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds() < 5.8){
+                leftfr.setPower(-0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds() < 6.5){
+                leftfr.setPower(0.0);
+                leftback.setPower(0.0);
+                rightfr.setPower(0.0);
+                rightback.setPower(0.0);
+                leftHook.setPosition(0);
+                rightHook.setPosition(0);
+            }
+
+            while(runtime.seconds()<8)  //strafe LEFT
+            {
+                leftfr.setPower(0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(0.5);
+            }
+
+            while(runtime.seconds()<9) //backward/straightening
+            {
+
+                leftfr.setPower(0.5);
+                leftback.setPower(0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds()<10) // strafe right
+            {
+                leftfr.setPower(0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(0.5);
+
+            }
+            while (runtime.seconds()<11)
+            {
+                leftfr.setPower(-0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(-0.5);
+            }
+            while (runtime.seconds() < 11.6){
+                leftfr.setPower(0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds()<12)
+            {
+                leftfr.setPower(-0.5);
+                leftback.setPower(-0.535);
+                rightfr.setPower(-0.5);
+                rightback.setPower(-0.5);
+            }
+
+            leftfr.setPower(0);
+            leftback.setPower(0);
+            rightfr.setPower(0);
+            rightback.setPower(0);
+
 
 
 
@@ -137,4 +233,3 @@ public class Short_Straight extends LinearOpMode {
         }
     }
 }
-
