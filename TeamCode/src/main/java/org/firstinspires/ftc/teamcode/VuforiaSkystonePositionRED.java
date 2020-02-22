@@ -481,8 +481,8 @@ public class VuforiaSkystonePositionRED extends LinearOpMode {
 
 
 
-        rangeMRSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeMRSensor");
-        colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
+//        rangeMRSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeMRSensor");
+//        colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
 
         CameraDevice.getInstance().setFlashTorchMode(true);
 
@@ -571,7 +571,7 @@ public class VuforiaSkystonePositionRED extends LinearOpMode {
                         GoingToWall(rightback, rightfr, leftfr, leftback, location2);
                         AcuTurnOpposite(80,true);
 
-//                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
+                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
                         MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
                         AcuTurn(-90, true);
                         DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);

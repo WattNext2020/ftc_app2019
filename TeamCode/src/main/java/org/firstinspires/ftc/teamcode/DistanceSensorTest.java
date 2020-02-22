@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -26,12 +28,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ColorSensor", group="Linear Opmode")
-public class ColorSensor extends LinearOpMode {
+@Autonomous(name="MR RangeSensorTest", group="Linear Opmode")
+public class DistanceSensorTest extends LinearOpMode {
     DcMotor leftfr, leftback, rightfr, rightback;
     Servo leftHook, rightHook;
 
-    ModernRoboticsI2cColorSensor  colorMRSensor;
+ModernRoboticsI2cRangeSensor rangeMRSensor;
     ElapsedTime runtime = new ElapsedTime();
 
 
@@ -52,11 +54,12 @@ public class ColorSensor extends LinearOpMode {
         leftHook = hardwareMap.get(Servo.class, "leftHook");
         rightHook = hardwareMap.get(Servo.class, "rightHook");
 
-        //     autoHook = hardwareMap.get(Servo.class, "autoHook");
+   //     autoHook = hardwareMap.get(Servo.class, "autoHook");
 
 
 
-          colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
+        rangeMRSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeMRSensor");
+      //  colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
 
 
 
@@ -67,6 +70,12 @@ public class ColorSensor extends LinearOpMode {
         leftback.setDirection(DcMotor.Direction.FORWARD);
         rightfr.setDirection(DcMotor.Direction.REVERSE);
         rightback.setDirection(DcMotor.Direction.REVERSE);
+
+
+
+        //rackPinionUD.setDirection(CRServo.Direction.FORWARD);
+        //rackPinionLR.setDirection(CRServo.Direction.FORWARD);
+
         //rightfr.setmode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //leftfr.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         //int MOTORTICKS = 1680;
@@ -79,16 +88,32 @@ public class ColorSensor extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive()) {
 
-            telemetry.addData("Red:",colorMRSensor.red());
-            telemetry.addData("Blue:",colorMRSensor.blue());
-            telemetry.update();
-
+            while(rangeMRSensor.getDistance(DistanceUnit.INCH)<25)
+            {
+                telemetry.addData("MR Range Sensor",rangeMRSensor.getDistance(DistanceUnit.INCH));
+                telemetry.update();
+                leftfr.setPower(0.2);
+                leftback.setPower(-0.2);
+                rightfr.setPower(-0.2);
+                rightback.setPower(0.2);
+            }
+            while(rangeMRSensor.getDistance(DistanceUnit.INCH)>25) {
+                telemetry.addData("MR Range Sensor",rangeMRSensor.getDistance(DistanceUnit.INCH));
+                telemetry.update();
+                leftfr.setPower(-0.2);
+                leftback.setPower(0.2);
+                rightfr.setPower(0.2);
+                rightback.setPower(-0.2);
+            }
+            double distance = rangeMRSensor.getDistance(DistanceUnit.INCH);
             leftfr.setPower(0);
             leftback.setPower(0);
             rightfr.setPower(0);
             rightback.setPower(0);
+            telemetry.addData("Distance to Wall Variable",distance);
+            telemetry.update();
+            sleep(40000);
             stop();
-
 
 
 
