@@ -31,6 +31,8 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Camera;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -69,6 +71,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -183,7 +186,8 @@ public class VuforiaSkystonePositionRED extends LinearOpMode {
     private Servo rightHook = null;
     private Servo leftHook = null;
 
-    public DistanceSensor sensorDistance;
+    public ModernRoboticsI2cRangeSensor rangeMRSensor;
+    public ModernRoboticsI2cColorSensor colorMRSensor;
 
     private Servo autoHook;
 
@@ -475,7 +479,11 @@ public class VuforiaSkystonePositionRED extends LinearOpMode {
 
         autoHook = hardwareMap.get(Servo.class, "autoHook");
 
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensorDistance");
+
+
+        rangeMRSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "rangeMRSensor");
+        colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
+
         CameraDevice.getInstance().setFlashTorchMode(true);
 
 
@@ -551,11 +559,19 @@ public class VuforiaSkystonePositionRED extends LinearOpMode {
                         MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback,0);
                         sleep(300);
                         AcuTurn(-90, true);
+                        //Distance Sensor code
+//while((rangeMRSensor.getDistance(DistanceUnit.INCH)<=24))
+//{
+//    leftfr.setPower(.2);
+//    leftback.setPower(-.2);
+//    rightfr.setPower(-.2);
+//    rightback.setPower(.2);
+//}                        //
                         DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
                         GoingToWall(rightback, rightfr, leftfr, leftback, location2);
                         AcuTurnOpposite(80,true);
 
-                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
+//                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
                         MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
                         AcuTurn(-90, true);
                         DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
@@ -609,6 +625,9 @@ public class VuforiaSkystonePositionRED extends LinearOpMode {
                             boolean counterClockwise = true;
                             MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, 0);
                             AcuTurn(-90, true);
+                            //Distance Sensor code
+
+                            //
                             DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
                             autoHook.setPosition(0.1);
                             //tmove(.2,0,0,.35,0);
