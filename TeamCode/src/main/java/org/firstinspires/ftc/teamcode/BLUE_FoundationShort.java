@@ -122,19 +122,19 @@ public class BLUE_FoundationShort extends LinearOpMode {
             //RED MODE
             while (runtime.seconds()< 1){
                 leftfr.setPower(0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds() < 1.4){
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds() < 2.7) {
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
@@ -148,13 +148,13 @@ public class BLUE_FoundationShort extends LinearOpMode {
             }
             while (runtime.seconds() < 5.7) { //bring foundation backwards
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds() < 5.8){
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
@@ -170,7 +170,7 @@ public class BLUE_FoundationShort extends LinearOpMode {
             while(runtime.seconds()<8)  //strafe LEFT
             {
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
@@ -179,14 +179,14 @@ public class BLUE_FoundationShort extends LinearOpMode {
             {
 
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds()<11) // strafe right
             {
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.535);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
 

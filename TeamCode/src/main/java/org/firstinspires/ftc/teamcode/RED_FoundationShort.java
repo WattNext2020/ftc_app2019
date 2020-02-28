@@ -120,21 +120,21 @@ public class RED_FoundationShort extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
 
             //RED MODE
-            while (runtime.seconds()< 0.8){
+            while (runtime.seconds()< 1){ //strafe right
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds() < 1.3){
+            while (runtime.seconds() < 1.3){ //back against wall
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds() < 2.7) {
+            while (runtime.seconds() < 2.7) { //forward
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
@@ -148,15 +148,15 @@ public class RED_FoundationShort extends LinearOpMode {
             }
             while (runtime.seconds() < 5.7) { //bring foundation backwards
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds() < 5.8){
-                leftfr.setPower(-0.4);
-                leftback.setPower(-0.5);
-                rightfr.setPower(-0.4);
-                rightback.setPower(-0.4);
+                leftfr.setPower(-0.3);
+                leftback.setPower(-0.3);
+                rightfr.setPower(-0.3);
+                rightback.setPower(-0.3);
             }
             while (runtime.seconds() < 6.5){
                 leftfr.setPower(0.0);
@@ -170,7 +170,7 @@ public class RED_FoundationShort extends LinearOpMode {
             while(runtime.seconds()<8)  //strafe LEFT
             {
                 leftfr.setPower(0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
             }
@@ -179,14 +179,14 @@ public class RED_FoundationShort extends LinearOpMode {
             {
 
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds()<11) // strafe right
             {
                 leftfr.setPower(0.5);
-                leftback.setPower(-0.535);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
 
