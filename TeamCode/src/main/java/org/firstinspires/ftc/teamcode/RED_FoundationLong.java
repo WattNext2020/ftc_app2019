@@ -199,14 +199,14 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightback.setPower(0.5);
 
             }
-            while (runtime.seconds()<11)
+            while (runtime.seconds()<10.75)
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds() < 12){
+            while (runtime.seconds() < 12.2){
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);

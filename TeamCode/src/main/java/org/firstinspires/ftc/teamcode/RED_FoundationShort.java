@@ -183,7 +183,7 @@ public class RED_FoundationShort extends LinearOpMode {
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds()<11) // strafe right
+            while (runtime.seconds()<10) // strafe right
             {
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);

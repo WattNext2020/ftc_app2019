@@ -165,7 +165,7 @@ public class BLUE_FoundationLong extends LinearOpMode {
                 rightHook.setPosition(0);
             }
 
-            while(runtime.seconds()<8)  //strafe LEFT
+            while(runtime.seconds()<8)  //strafe right
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(0.5);
@@ -181,7 +181,7 @@ public class BLUE_FoundationLong extends LinearOpMode {
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds()<9.65) // strafe right
+            while (runtime.seconds()<10) // strafe right
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(0.5);
@@ -189,26 +189,26 @@ public class BLUE_FoundationLong extends LinearOpMode {
                 rightback.setPower(-0.5);
 
             }
-            while (runtime.seconds()<10.7)
+            while (runtime.seconds()<11)
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds() < 11.4){
+            while (runtime.seconds() < 12){
                 leftfr.setPower(-0.5);
                 leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds()<11.8)
-            {
-                leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(-0.5);
-            }
+//            while (runtime.seconds()<11.8)
+//            {
+//                leftfr.setPower(-0.5);
+//                leftback.setPower(-0.5);
+//                rightfr.setPower(-0.5);
+//                rightback.setPower(-0.5);
+//            }
 
             leftfr.setPower(0);
             leftback.setPower(0);
