@@ -2,6 +2,8 @@
 <Robot type="FirstInspires-FTC">
     <LynxUsbDevice name="Expansion Hub Portal 1" serialNumber="DQ3LY51T" parentModuleAddress="10">
         <LynxModule name="Expansion Hub 10" port="10">
+            <NeveRest40Gearmotor name="intakeArm" port="0" />
+            <Servo name="autoHook" port="5" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
         </LynxModule>
     </LynxUsbDevice>
@@ -16,8 +18,8 @@
             <Servo name="leftHook" port="2" />
             <Servo name="rightHook" port="3" />
             <Servo name="NewCap" port="4" />
-            <ContinuousRotationServo name="intakeArm" port="5" />
             <LynxEmbeddedIMU name="imu 1" port="0" bus="0" />
+            <LynxColorSensor name="sensorDistance" port="0" bus="2" />
         </LynxModule>
     </LynxUsbDevice>
 </Robot>
