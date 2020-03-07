@@ -114,6 +114,7 @@ public class TeleOpMode extends LinearOpMode {
 
 
         autoHook = hardwareMap.get(Servo.class,"autoHook");
+        //comment
 
         rightHook.setDirection(Servo.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.FORWARD);
