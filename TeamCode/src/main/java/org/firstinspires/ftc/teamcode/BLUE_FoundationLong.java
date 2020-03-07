@@ -120,19 +120,19 @@ public class BLUE_FoundationLong extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
             while (runtime.seconds()< 1){
                 leftfr.setPower(0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds() < 1.4){
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds() < 2.7) {
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
@@ -146,13 +146,13 @@ public class BLUE_FoundationLong extends LinearOpMode {
             }
             while (runtime.seconds() < 5.7) { //bring foundation backwards
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds() < 5.8){
-                leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftfr.setPower(-0.5);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
@@ -168,7 +168,7 @@ public class BLUE_FoundationLong extends LinearOpMode {
             while(runtime.seconds()<8)  //strafe LEFT
             {
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
@@ -177,14 +177,14 @@ public class BLUE_FoundationLong extends LinearOpMode {
             {
 
                 leftfr.setPower(0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
             while (runtime.seconds()<9.65) // strafe right
             {
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
 
@@ -192,20 +192,20 @@ public class BLUE_FoundationLong extends LinearOpMode {
             while (runtime.seconds()<10.7)
             {
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.6);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
             while (runtime.seconds() < 11.4){
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.6);
+                leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
             while (runtime.seconds()<11.8)
             {
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.535);
+                leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
