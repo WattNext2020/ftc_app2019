@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -56,6 +57,7 @@ public class RED_FoundationLong extends LinearOpMode {
     private Servo leftHook = null;
 
     private DistanceSensor sensorRange;
+    ModernRoboticsI2cColorSensor  colorMRSensor;
 
     Servo newCap;
 
@@ -92,6 +94,7 @@ public class RED_FoundationLong extends LinearOpMode {
         rightHook = hardwareMap.get(Servo.class,"rightHook");
         leftHook = hardwareMap.get(Servo.class,"leftHook");
         newCap = hardwareMap.get(Servo.class, "NewCap");
+        colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
 
         newCap.setPosition(0);
 
@@ -118,6 +121,7 @@ public class RED_FoundationLong extends LinearOpMode {
 
         leftWheels.setPower(0);
         rightWheels.setPower(0);
+        colorMRSensor.enableLed(true);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -140,7 +144,7 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds() < 2.7) {
+            while (runtime.seconds() < 2.4) {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
@@ -160,12 +164,6 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds() < 5.8){
-                leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(-0.5);
-            }
             while (runtime.seconds() < 6.5){
                 leftfr.setPower(0.0);
                 leftback.setPower(0.0);
@@ -182,7 +180,12 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
             }
-
+            while (runtime.seconds() < 8.1){
+                leftfr.setPower(-0.5);
+                leftback.setPower(-0.5);
+                rightfr.setPower(-0.5);
+                rightback.setPower(-0.5);
+            }
             while(runtime.seconds()<9) //backward/straightening
             {
 
@@ -191,7 +194,7 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds()<10) // strafe right
+            while (runtime.seconds()<9.6) // strafe right
             {
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);
@@ -199,25 +202,27 @@ public class RED_FoundationLong extends LinearOpMode {
                 rightback.setPower(0.5);
 
             }
-            while (runtime.seconds()<10.75)
+            while (runtime.seconds()<11)
             {
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds() < 12.2){
+            while (!(colorMRSensor.red()>10)) // strafe right
+            {
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
+
             }
 
             leftfr.setPower(0);
             leftback.setPower(0);
             rightfr.setPower(0);
             rightback.setPower(0);
-
+            stop();
 
 
 

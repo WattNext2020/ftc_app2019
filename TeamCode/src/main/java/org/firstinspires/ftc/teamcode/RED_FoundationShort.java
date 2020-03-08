@@ -36,6 +36,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 
 @Autonomous(name= "RED Foundation Short", group= "Linear Opmode")
 
@@ -56,6 +59,7 @@ public class RED_FoundationShort extends LinearOpMode {
     private Servo leftHook = null;
 
     private DistanceSensor sensorRange;
+    ModernRoboticsI2cColorSensor  colorMRSensor;
 
     double leftfrPower;
     double leftbackPower;
@@ -88,6 +92,7 @@ public class RED_FoundationShort extends LinearOpMode {
 
         leftHook = hardwareMap.get(Servo.class, "leftHook");
         rightHook = hardwareMap.get(Servo.class, "rightHook");
+        colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
 
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -109,6 +114,7 @@ public class RED_FoundationShort extends LinearOpMode {
 
         leftHook.setPosition(0);
         rightHook.setPosition(0);
+        colorMRSensor.enableLed(true);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -119,20 +125,19 @@ public class RED_FoundationShort extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
 
-            //RED MODE
-            while (runtime.seconds()< 1){ //strafe right
+            while (runtime.seconds()< 1.2){ //strafe right
                 leftfr.setPower(-0.5);
                 leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
-            while (runtime.seconds() < 1.3){ //back against wall
+            while (runtime.seconds() < 1.4){ //back against wall
                 leftfr.setPower(0.5);
                 leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds() < 2.7) { //forward
+            while (runtime.seconds() < 2.4) { //forward
                 leftfr.setPower(-0.5);
                 leftback.setPower(-0.5);
                 rightfr.setPower(-0.5);
@@ -152,12 +157,6 @@ public class RED_FoundationShort extends LinearOpMode {
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds() < 5.8){
-                leftfr.setPower(-0.3);
-                leftback.setPower(-0.3);
-                rightfr.setPower(-0.3);
-                rightback.setPower(-0.3);
-            }
             while (runtime.seconds() < 6.5){
                 leftfr.setPower(0.0);
                 leftback.setPower(0.0);
@@ -166,7 +165,6 @@ public class RED_FoundationShort extends LinearOpMode {
                 leftHook.setPosition(0);
                 rightHook.setPosition(0);
             }
-
             while(runtime.seconds()<8)  //strafe LEFT
             {
                 leftfr.setPower(0.5);
@@ -175,15 +173,20 @@ public class RED_FoundationShort extends LinearOpMode {
                 rightback.setPower(0.5);
             }
 
+            while (runtime.seconds() < 8.1){
+                leftfr.setPower(-0.5);
+                leftback.setPower(-0.5);
+                rightfr.setPower(-0.5);
+                rightback.setPower(-0.5);
+            }
             while(runtime.seconds()<9) //backward/straightening
             {
-
                 leftfr.setPower(0.5);
                 leftback.setPower(0.5);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds()<10) // strafe right
+            while (!(colorMRSensor.red()>10)) // strafe right
             {
                 leftfr.setPower(0.5);
                 leftback.setPower(-0.5);
@@ -195,7 +198,7 @@ public class RED_FoundationShort extends LinearOpMode {
             leftback.setPower(0);
             rightfr.setPower(0);
             rightback.setPower(0);
-
+            stop();
 
 
 
