@@ -49,6 +49,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
@@ -436,7 +437,12 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
         leftHook = hardwareMap.get(Servo.class, "leftHook");
         rightHook = hardwareMap.get(Servo.class, "rightHook");
 
+
+
         autoHook = hardwareMap.get(Servo.class, "autoHook");
+        rangeMRSensor = hardwareMap.get(ModernRoboticsI2cRangeSensor.class,"rangeMRSensor");
+        colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class,"colorMRSensor");
+
 
 
 
@@ -521,6 +527,44 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
                         MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback,0);
                         sleep(300);
                         AcuTurn(-90, true, true);
+                        sleep(500);
+                        if(rangeMRSensor.getDistance(DistanceUnit.CM)<62)
+                        {
+                            rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                            while(rangeMRSensor.getDistance(DistanceUnit.CM)<62 &&!isStopRequested()) {
+
+                                telemetry.addData("Strafing To BRIDGE", true);
+                                rightback.setPower(-0.4);
+                                rightfr.setPower(0.55);
+                                leftback.setPower(0.4);
+                                leftfr.setPower(-0.4);
+                                telemetry.addData("Distance", rangeMRSensor.getDistance(DistanceUnit.CM));
+                                telemetry.update();
+
+                            }
+                        }
+                       else
+                        {
+                            rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                            while(rangeMRSensor.getDistance(DistanceUnit.CM)>62 &&!isStopRequested()) {
+
+                                rightback.setPower(0.4);
+                                rightfr.setPower(-0.55);
+                                leftback.setPower(-0.4);
+                                leftfr.setPower(0.4);
+                                telemetry.addData("Strafing TO WALL", true);
+                                telemetry.addData("Distance", rangeMRSensor.getDistance(DistanceUnit.CM));
+                                telemetry.update();
+                            }
+
+                        }
+
+                        leftfr.setPower(0);
+                        leftback.setPower(0);
+                        rightfr.setPower(0);
+                        rightback.setPower(0);
+
+
                         //Distance Sensor code
 //while((rangeMRSensor.getDistance(DistanceUnit.INCH)<=24))
 //{
@@ -568,7 +612,7 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
                 LoopTimer.reset();
                 telemetry.addData("Not in Position 1", " ");
                 telemetry.update();
-                runTime=0.8;
+                runTime=0.7;
                 EncoderStrafe(rightback, rightfr, leftfr, leftback, initTime, runTime);
                 ElapsedTime LoopTimer2 = new ElapsedTime();
                 LoopTimer2.reset();
@@ -589,6 +633,41 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
                             MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, 0);
                             AcuTurn(-90, true, true);
                             //Distance Sensor code
+                            if(rangeMRSensor.getDistance(DistanceUnit.CM)<62)
+                            {
+                                rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                                while(rangeMRSensor.getDistance(DistanceUnit.CM)<62 &&!isStopRequested()) {
+
+                                    telemetry.addData("Strafing To BRIDGE", true);
+                                    rightback.setPower(-0.4);
+                                    rightfr.setPower(0.55);
+                                    leftback.setPower(0.4);
+                                    leftfr.setPower(-0.4);
+                                    telemetry.addData("Distance", rangeMRSensor.getDistance(DistanceUnit.CM));
+                                    telemetry.update();
+
+                                }
+                            }
+                            else
+                            {
+                                rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                                while(rangeMRSensor.getDistance(DistanceUnit.CM)>62 &&!isStopRequested()) {
+
+                                    rightback.setPower(0.4);
+                                    rightfr.setPower(-0.55);
+                                    leftback.setPower(-0.4);
+                                    leftfr.setPower(0.4);
+                                    telemetry.addData("Strafing TO WALL", true);
+                                    telemetry.addData("Distance", rangeMRSensor.getDistance(DistanceUnit.CM));
+                                    telemetry.update();
+                                }
+
+                            }
+
+                            leftfr.setPower(0);
+                            leftback.setPower(0);
+                            rightfr.setPower(0);
+                            rightback.setPower(0);
 
                             //
                             DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
@@ -607,7 +686,7 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
 //
 //                            AcuTurn(-90, true);
 //                            DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
-                            sleep(2000);
+                            sleep(1000);
                             Parking(rightback, rightfr, leftfr, leftback, location);
 
                             //  DeliverySkystone2 (rightback, rightfr, leftfr, leftback, location2);
@@ -623,7 +702,7 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
 
             if (skystoneVisible == false) {
                 initTime = 0;
-                runTime=0.8;
+                runTime=0.7;
                 EncoderStrafe(rightback, rightfr, leftfr, leftback, initTime, runTime);
                 telemetry.addData("Skystone:", "Assumed Position 4");
                 telemetry.update();
@@ -634,6 +713,42 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
                 targetsSkyStone.deactivate();
                 MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, 3);
                 AcuTurn(-92, true, true);
+                if(rangeMRSensor.getDistance(DistanceUnit.CM)<62)
+                {
+                    rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    while(rangeMRSensor.getDistance(DistanceUnit.CM)<62 &&!isStopRequested()) {
+
+                        telemetry.addData("Strafing To BRIDGE", true);
+                        rightback.setPower(-0.4);
+                        rightfr.setPower(0.55);
+                        leftback.setPower(0.4);
+                        leftfr.setPower(-0.4);
+                        telemetry.addData("Distance", rangeMRSensor.getDistance(DistanceUnit.CM));
+                        telemetry.update();
+
+                    }
+                }
+                else
+                {
+                    rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    while(rangeMRSensor.getDistance(DistanceUnit.CM)>62 &&!isStopRequested()) {
+
+                        rightback.setPower(0.4);
+                        rightfr.setPower(-0.55);
+                        leftback.setPower(-0.4);
+                        leftfr.setPower(0.4);
+                        telemetry.addData("Strafing TO WALL", true);
+                        telemetry.addData("Distance", rangeMRSensor.getDistance(DistanceUnit.CM));
+                        telemetry.update();
+                    }
+
+                }
+
+                leftfr.setPower(0);
+                leftback.setPower(0);
+                rightfr.setPower(0);
+                rightback.setPower(0);
+                sleep(300);
                 DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
 //                GoingToWall(rightback, rightfr, leftfr, leftback, location2);
 //                AcuTurnOpposite(80,true);
@@ -648,8 +763,8 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
 
 
 
-             //    DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
-                sleep(2000);
+                //    DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                sleep(1000);
                 Parking(rightback, rightfr, leftfr, leftback, location);
                 stop();
             }
@@ -896,37 +1011,24 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
 
     public void Parking (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor leftback, int location)
     {
+rightback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftback.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftfr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        int back = 0;
-        if(location == 1)
+        while((!(colorMRSensor.red()>15)) && !isStopRequested())
         {
-            back = 100;
+            leftfr.setPower(-0.4);
+            leftback.setPower(-0.4);
+            rightfr.setPower(-0.4);
+            rightback.setPower(-0.4);
         }
-        telemetry.addData("Parking", " ");
-        telemetry.update();
-        rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightback.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightback.setTargetPosition(rightback.getCurrentPosition() - 500 - back) ;
-        rightback.setPower(0.50);
-        rightback.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightfr.setPower(-0.50);
-        leftfr.setPower(-0.50);
-        leftback.setPower(-0.65);
-        while (rightback.isBusy()) {
-            if (rightback.getCurrentPosition() <= (rightback.getTargetPosition() + 15)) {
-                leftback.setPower(0);
-                rightback.setPower(0);
-                rightfr.setPower(0);
-                leftfr.setPower(0);
-                leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightback.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftfr.setPower(0);
+        leftback.setPower(0);
+        rightfr.setPower(0);
+        rightback.setPower(0);
                 return;
             }
-        }
-    }
 
     public void DeliverySkystone2 (DcMotor rightback, DcMotor rightfr, DcMotor leftfr, DcMotor
             leftback,int location2)
@@ -999,7 +1101,7 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
         rightfr.setPower(0.80);
         leftfr.setPower(0.80);
         leftback.setPower(0.8);
-        while (rightback.isBusy()) {
+        while (rightback.isBusy() && !isStopRequested()) {
             telemetry.addData("RUNNING RIGHT BACK MOTOR:",true);
             telemetry.update();
 
@@ -1037,7 +1139,7 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
         leftback.setPower(0.45);
 
 
-        while (rightback.isBusy()) {
+        while (rightback.isBusy() &&!isStopRequested()) {
 
             if (rightback.getCurrentPosition() >= (rightback.getTargetPosition() - 400)) {
                 rightback.setPower(0.25);
@@ -1538,7 +1640,7 @@ public class VuforiaSkystonePositionRED1 extends LinearOpMode {
 
         if(First == true)
         {
-           moved = -firstHeading + (angles.firstAngle) ;
+            moved = -firstHeading + (angles.firstAngle) ;
         }
         lastHead = angles.firstAngle;
         telemetry.addData("TestSTATEMENT:", moved != Degrees);
