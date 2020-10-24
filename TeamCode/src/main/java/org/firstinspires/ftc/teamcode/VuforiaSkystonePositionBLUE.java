@@ -280,7 +280,7 @@ public class VuforiaSkystonePositionBLUE extends LinearOpMode {
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-
+        //leftfr.setPIDCoefficients();
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
@@ -561,14 +561,14 @@ public class VuforiaSkystonePositionBLUE extends LinearOpMode {
                         sleep(300);
                         AcuTurnOpposite(82, true, true);
                         DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
-//                        GoingToWall(rightback, rightfr, leftfr, leftback, location2);
-//                        sleep(500);
-//                        AcuTurn(-82,true);
-//                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
-//                        MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
-//                         AcuTurnOpposite(90, true, true);
-//                         strafeLittle(rightback, rightfr, leftfr, leftback,.4);
-//                         DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                        GoingToWall(rightback, rightfr, leftfr, leftback, location2);
+                        sleep(500);
+                        AcuTurn(-82,true);
+                        EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
+                        MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
+                         AcuTurnOpposite(85, true, true);
+                         strafeLittle(rightback, rightfr, leftfr, leftback,.4);
+                         DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
                         Parking(rightback, rightfr, leftfr, leftback);
 
                         // AcuTurn(90,false);
@@ -620,12 +620,12 @@ public class VuforiaSkystonePositionBLUE extends LinearOpMode {
                             MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, 0);
                             AcuTurnOpposite(82, true, true);
                             DeliverySkystone(rightback, rightfr, leftfr, leftback, location);
-//                            GoingToWall(rightback, rightfr, leftfr, leftback, location2);
-//                            AcuTurn(-70,true);
-//                            EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
-//                            MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
-//                            AcuTurnOpposite(90, true, true);
-//                            DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
+                            GoingToWall(rightback, rightfr, leftfr, leftback, location2);
+                            AcuTurn(-80,true);
+                            EncoderStrafe2nd(rightback, rightfr, leftfr, leftback, location,.4, location2);
+                            MovingtoSkystoneAndBack(rightback, rightfr, leftfr, leftback, location2);
+                            AcuTurnOpposite(87, true, true);
+                            DeliverySkystone2(rightback, rightfr, leftfr, leftback, location2);
                             Parking(rightback, rightfr, leftfr, leftback);
 
                             //  DeliverySkystone2 (rightback, rightfr, leftfr, leftback, location2);

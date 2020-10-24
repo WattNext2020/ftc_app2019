@@ -37,9 +37,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name= "Blue Foundation", group= "Linear Opmode")
+@Autonomous(name= "BLUE Foundation Short", group= "Linear Opmode")
 
-public class BLUE_Foundation extends LinearOpMode {
+public class BLUE_FoundationShort extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftfr = null;
@@ -119,16 +119,22 @@ public class BLUE_Foundation extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
 
-            //BLUE MODE
-            while (runtime.seconds()< .9){
+            //RED MODE
+            while (runtime.seconds()< 1){
                 leftfr.setPower(0.5);
-                leftback.setPower(-0.5);
+                leftback.setPower(-0.6);
                 rightfr.setPower(-0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds() < 2) {
+            while (runtime.seconds() < 1.4){
+                leftfr.setPower(0.5);
+                leftback.setPower(0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds() < 2.7) {
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
+                leftback.setPower(-0.6);
                 rightfr.setPower(-0.5);
                 rightback.setPower(-0.5);
             }
@@ -140,19 +146,19 @@ public class BLUE_Foundation extends LinearOpMode {
                 leftHook.setPosition(1);
                 rightHook.setPosition(1);
             }
-            while (runtime.seconds() < 5) {
+            while (runtime.seconds() < 5.7) { //bring foundation backwards
                 leftfr.setPower(0.5);
-                leftback.setPower(0.5);
+                leftback.setPower(0.6);
                 rightfr.setPower(0.5);
                 rightback.setPower(0.5);
             }
-            while (runtime.seconds() < 5.05){
+            while (runtime.seconds() < 5.8){
                 leftfr.setPower(-0.5);
-                leftback.setPower(-0.5);
-                rightfr.setPower(0.5);
-                rightback.setPower(0.5);
+                leftback.setPower(-0.6);
+                rightfr.setPower(-0.5);
+                rightback.setPower(-0.5);
             }
-            while (runtime.seconds() < 7.5){
+            while (runtime.seconds() < 6.5){
                 leftfr.setPower(0.0);
                 leftback.setPower(0.0);
                 rightfr.setPower(0.0);
@@ -160,22 +166,36 @@ public class BLUE_Foundation extends LinearOpMode {
                 leftHook.setPosition(0);
                 rightHook.setPosition(0);
             }
-            while (runtime.seconds() < 7.55){
-                leftfr.setPower(0.5);
-                leftback.setPower(0.5);
-                rightfr.setPower(-0.5);
-                rightback.setPower(-0.5);
-            }
-            while (runtime.seconds() < 11) {
+
+            while(runtime.seconds()<8)  //strafe LEFT
+            {
                 leftfr.setPower(-0.5);
-                leftback.setPower(0.5);
+                leftback.setPower(0.6);
                 rightfr.setPower(0.5);
                 rightback.setPower(-0.5);
             }
-            leftfr.setPower(0.0);
-            leftback.setPower(0.0);
-            rightfr.setPower(0.0);
-            rightback.setPower(0.0);
+
+            while(runtime.seconds()<9) //backward/straightening
+            {
+
+                leftfr.setPower(0.5);
+                leftback.setPower(0.6);
+                rightfr.setPower(0.5);
+                rightback.setPower(0.5);
+            }
+            while (runtime.seconds()<11) // strafe right
+            {
+                leftfr.setPower(-0.5);
+                leftback.setPower(0.535);
+                rightfr.setPower(0.5);
+                rightback.setPower(-0.5);
+
+            }
+            leftfr.setPower(0);
+            leftback.setPower(0);
+            rightfr.setPower(0);
+            rightback.setPower(0);
+
 
 
 
@@ -184,4 +204,3 @@ public class BLUE_Foundation extends LinearOpMode {
         }
     }
 }
-
