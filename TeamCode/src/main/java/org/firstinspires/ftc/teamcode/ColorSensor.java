@@ -1,4 +1,3 @@
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
@@ -44,19 +43,22 @@ public class ColorSensor extends LinearOpMode {
         rightfr = hardwareMap.get(DcMotor.class, "rightf");
         rightback = hardwareMap.get(DcMotor.class, "rightb");
 
-//        leftWheels = hardwareMap.get(CRServo.class, "lw");
-//        rightWheels = hardwareMap.get(CRServo.class, "rw");
+
+        leftfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE); //Makes motors brake when set to 0
+        leftback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightfr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightback.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         //rackPinionUD = hardwareMap.get (CRServo.class, "rpUpDown");
         //rackPinionLR = hardwareMap.get (CRServo.class, "rpLeftRight");
 
         leftHook = hardwareMap.get(Servo.class, "leftHook");
         rightHook = hardwareMap.get(Servo.class, "rightHook");
 
-        //     autoHook = hardwareMap.get(Servo.class, "autoHook");
 
 
 
-          colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
+        colorMRSensor = hardwareMap.get(ModernRoboticsI2cColorSensor.class, "colorMRSensor");
 
 
 
@@ -70,6 +72,8 @@ public class ColorSensor extends LinearOpMode {
         //rightfr.setmode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //leftfr.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         //int MOTORTICKS = 1680;
+        rightHook.setDirection(Servo.Direction.REVERSE);
+
 
         leftHook.setPosition(0);
         rightHook.setPosition(0);
@@ -78,11 +82,19 @@ public class ColorSensor extends LinearOpMode {
         waitForStart();
         runtime.reset();
         while (opModeIsActive()) {
-
+            colorMRSensor.enableLed(true);
             telemetry.addData("Red:",colorMRSensor.red());
             telemetry.addData("Blue:",colorMRSensor.blue());
             telemetry.update();
 
+
+            while(!((colorMRSensor.red() + colorMRSensor.blue() + colorMRSensor.green())/3>15))
+            {
+                leftfr.setPower(-0.4);
+                leftback.setPower(-0.4);
+                rightfr.setPower(-0.4);
+                rightback.setPower(-0.4);
+            }
             leftfr.setPower(0);
             leftback.setPower(0);
             rightfr.setPower(0);
@@ -98,8 +110,6 @@ public class ColorSensor extends LinearOpMode {
 
     }
 }
-
-
 
 
 
